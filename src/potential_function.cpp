@@ -13,7 +13,7 @@ PotentialFunction::PotentialFunction()
 
 PotentialFunction::~PotentialFunction()
 {
-
+    
 }
 
 
