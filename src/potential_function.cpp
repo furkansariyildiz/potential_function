@@ -10,6 +10,7 @@ Node("potential_function_node")
     _target_pose_list_subscriber = this->create_subscription<potential_function::msg::TargetPoseList>("/target_pose_list", 1000, bind(&PotentialFunction::targetPoseListCallback, this, placeholders::_1));
 
     _b_i = vector<vector<double>>(_number_of_robots, vector<double>(3));
+    _b_g = vector<vector<double>>(_number_of_robots, vector<double>(2));
 }
 
 
@@ -23,7 +24,11 @@ PotentialFunction::~PotentialFunction()
 
 void PotentialFunction::targetPoseListCallback(const potential_function::msg::TargetPoseList::SharedPtr message)
 {
-    
+    for(int i=0; i<message->target_pose_list.size(); i++)
+    {
+        _b_g[i][1] = message->target_pose_list[i].target_pose.position.x;
+        _b_g[i][2] = message->target_pose_list[i].target_pose.position.y;
+    }
 }
 
 

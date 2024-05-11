@@ -1,2 +1,1 @@
-std_msgs/Header header
-geometry_msgs/Pose[] target_positions
+potential_function/TargetPose[] target_pose_list
