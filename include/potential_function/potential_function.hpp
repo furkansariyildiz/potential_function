@@ -4,7 +4,7 @@
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp/time.hpp>
 #include <iostream>
-#include <mpfr.hpp>
+// #include <mpfr.hpp>
 
 using namespace std;
 
@@ -19,20 +19,24 @@ class PotentialFunction
          * @brief
         */
         PotentialFunction();
-        
+
+
+
+        /**
+         * @brief
+        */
+        ~PotentialFunction();
+
+
+
+        void targetPoseListCallback();
+
 
 
         /**
          * @brief Finding robots in RS meter range
         */
         void findRobotsInRange(void);
-
-
-        
-        /**
-         * @brief
-        */
-        ~PotentialFunction();
 
 
 
