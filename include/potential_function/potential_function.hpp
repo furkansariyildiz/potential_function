@@ -4,13 +4,14 @@
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp/time.hpp>
 #include <iostream>
+#include <potential_function/msg/target_pose_list.hpp>
 // #include <mpfr.hpp>
 
 using namespace std;
 
 
 
-class PotentialFunction
+class PotentialFunction : rclcpp::Node
 {
     private:
 
@@ -29,7 +30,17 @@ class PotentialFunction
 
 
 
-        void targetPoseListCallback();
+        /**
+         * @brief
+        */
+        rclcpp::Subscription<potential_function::msg::TargetPoseList>::SharedPtr _target_pose_list_subscriber;
+
+
+
+        /**
+         * @brief
+        */
+        void targetPoseListCallback(const potential_function::msg::TargetPoseList::SharedPtr message);
 
 
 

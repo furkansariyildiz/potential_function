@@ -4,14 +4,24 @@ using namespace std;
 
 
 
-PotentialFunction::PotentialFunction()
-{
+PotentialFunction::PotentialFunction():
+Node("potential_function_node")
+{   
+    _target_pose_list_subscriber = this->create_subscription<potential_function::msg::TargetPoseList>("/target_pose_list", 1000, bind(&PotentialFunction::targetPoseListCallback, this, placeholders::_1));
+
     _b_i = vector<vector<double>>(_number_of_robots, vector<double>(3));
 }
 
 
 
 PotentialFunction::~PotentialFunction()
+{
+    
+}
+
+
+
+void PotentialFunction::targetPoseListCallback(const potential_function::msg::TargetPoseList::SharedPtr message)
 {
     
 }
