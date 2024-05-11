@@ -20,12 +20,26 @@ class PotentialFunction
         */
         PotentialFunction();
         
-        
+
+
+        /**
+         * @brief Finding robots in RS meter range
+        */
+        void findRobotsInRange(void);
+
+
         
         /**
          * @brief
         */
         ~PotentialFunction();
+
+
+
+        /**
+         * @brief Alpha and Beta
+        */
+        void calculateAAndB(void);
 
 
         
@@ -81,6 +95,32 @@ class PotentialFunction
          * @brief
         */
         long double _dQ_division_dA;
+
+
+
+        /**
+         * @brief Current robot id
+        */
+        int _robot_id;
+
+
+        /**
+         * @brief
+        */
+        int _number_of_robots;
+
+
+        /**
+         * @brief Limit for distance between current robot and other robots or obstacles.
+        */
+        double _limit_distance;
+
+
+
+        /**
+         * @brief 
+        */
+        vector<vector<double>> _b_i;
 };
 
 #endif
