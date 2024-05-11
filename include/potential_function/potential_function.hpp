@@ -126,6 +126,18 @@ class PotentialFunction : rclcpp::Node
 
 
         /**
+         * @brief Alpha
+        */
+        double _alpha;
+
+
+        /**
+         * @brief Beta
+        */
+        double _beta;
+
+
+        /**
          * @brief Limit for distance between current robot and other robots or obstacles.
         */
         double _limit_distance;

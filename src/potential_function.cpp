@@ -26,8 +26,8 @@ void PotentialFunction::targetPoseListCallback(const potential_function::msg::Ta
 {
     for(int i=0; i<message->target_pose_list.size(); i++)
     {
-        _b_g[i][1] = message->target_pose_list[i].target_pose.position.x;
-        _b_g[i][2] = message->target_pose_list[i].target_pose.position.y;
+        _b_g[message->target_pose_list[i].robot_id][0] = message->target_pose_list[i].target_pose.position.x;
+        _b_g[message->target_pose_list[i].robot_id][1] = message->target_pose_list[i].target_pose.position.y;
     }
 }
 
@@ -50,9 +50,23 @@ void PotentialFunction::findRobotsInRange(void)
 
 void PotentialFunction::calculateAAndB(void)
 {
+    _alpha = 0.0;
+    
     for(int i=0; i<_number_of_robots; i++)
     {
-        // if()
+        if(_b_i[i][3] != 0)
+        {
+            double distance = pow((_b_i[i][0] - _b_g[i][1]), 2) + pow((_b_i[i][1] - _b_g[i][1]), 2);
+        
+            _alpha = _alpha + distance;
+        }
+    }
+
+    _beta = 1.0;
+
+    for(int i=0; i<_number_of_robots; i++)
+    {
+        
     }
 }
 
