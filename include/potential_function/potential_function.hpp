@@ -160,6 +160,13 @@ class PotentialFunction : rclcpp::Node
         double _limit_distance_for_obstacles;
 
 
+
+        /**
+         * @brief Radius of outer boundary;
+        */
+        double _radius_outer;
+
+
         /**
          * @brief Robot positions
         */

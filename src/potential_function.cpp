@@ -134,9 +134,24 @@ void PotentialFunction::calculateAAndB(void)
         }
     }
 
+    // Calculating beta for outer (bounder)
     for(int i=0; i<_number_of_robots; i++)
     {
+        double distance = -1;
         
+        if(_b_i[i][2] != 0)
+        {
+            distance = abs(pow((_radius_outer - _b_i[i][2]), 2) - pow(_b_i[i][0], 2) - pow(_b_i[i][1], 2));
+        }
+        else if(_b_rs[i][2] != 0)
+        {
+            distance = abs(pow((_radius_outer - _b_rs[i][2]), 2) - pow(_b_rs[i][0], 2) - pow(_b_rs[i][1], 2));
+        }
+
+        if(distance > 0)
+        {
+            _beta = _beta * distance;
+        }
     }
 }
 
