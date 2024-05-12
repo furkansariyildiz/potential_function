@@ -12,6 +12,7 @@ Node("potential_function_node")
     _b_i = vector<vector<double>>(_number_of_robots, vector<double>(3));
     _b_g = vector<vector<double>>(_number_of_robots, vector<double>(2));
     _b_rs = vector<vector<double>>(_number_of_robots, vector<double>(3));
+    _b_obstacles = vector<vector<double>>(_number_of_obstacles, vector<double>(2));
 }
 
 
@@ -102,12 +103,40 @@ void PotentialFunction::calculateAAndB(void)
                     // Caution, pow(_b_i[i][2]) process is required?
                     distance = abs(pow((_b_i[i][0] - _b_i[j][0]), 2) + pow((_b_i[i][1] - _b_i[j][1]), 2) - pow((_b_i[i][2] + _b_i[j][2]), 2));
                 }
+                else if((_b_rs[i][2] != 0) && (_b_i[j][2] != 0))
+                {
+                    distance = abs(pow((_b_rs[i][0] - _b_i[j][0]), 2) + pow((_b_rs[i][1] - _b_i[j][1]), 2) - pow((_b_rs[i][2] + _b_i[j][2]), 2));
+                }
+                else if((_b_i[i][2] != 0) && (_b_rs[j][2] != 0))
+                {
+                    distance = abs(pow((_b_i[i][0] - _b_rs[j][0]), 2) + pow((_b_i[i][1] - _b_rs[j][1]), 2) - pow((_b_i[i][2] + _b_rs[j][2]), 2));
+                }
                 else if((_b_rs[i][2] != 0) && (_b_rs[j][2] != 0))
                 {
-                    
+                    distance = abs(pow((_b_rs[i][0] - _b_rs[j][0]), 2) + pow((_b_rs[i][1] - _b_rs[j][1]), 2) - pow((_b_rs[i][2] + _b_rs[j][2]), 2));
+                }
+                if(distance > 0)
+                {
+                    _beta = _beta * distance;
                 }
             }
         }
+    }
+
+    // Calculating beta for obstacles relative to current robot
+    for(int i=0; i<_number_of_obstacles; i++)
+    {
+        double distance = abs(pow((_b_i[_robot_id][0] - _b_obstacles[i][0]), 2) + pow((_b_i[_robot_id][1] - _b_obstacles[i][1]), 2) - pow((_b_i[_robot_id][2] - _b_obstacles[i][2]), 2));
+
+        if(distance < _limit_distance_for_obstacles)
+        {
+            _beta = _beta * distance;
+        }
+    }
+
+    for(int i=0; i<_number_of_robots; i++)
+    {
+        
     }
 }
 

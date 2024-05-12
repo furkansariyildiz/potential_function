@@ -128,6 +128,12 @@ class PotentialFunction : rclcpp::Node
 
 
         /**
+         * @brief Number of obstacles to create vector object with index.
+        */
+        int _number_of_obstacles;
+
+
+        /**
          * @brief Alpha
         */
         double _alpha;
@@ -142,10 +148,16 @@ class PotentialFunction : rclcpp::Node
 
 
         /**
-         * @brief Limit for distance between current robot and other robots or obstacles.
+         * @brief Limit for distance between current robot and other robots.
         */
         double _limit_distance;
 
+
+
+        /**
+         * @brief Limit for distance between current robot and obstacles.
+        */
+        double _limit_distance_for_obstacles;
 
 
         /**
@@ -166,6 +178,10 @@ class PotentialFunction : rclcpp::Node
          * @brief Restricted area position
         */
         vector<vector<double>> _b_rs;
+
+
+
+        vector<vector<double>> _b_obstacles;
 };
 
 #endif
