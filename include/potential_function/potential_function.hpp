@@ -119,10 +119,12 @@ class PotentialFunction : rclcpp::Node
         int _robot_id;
 
 
+
         /**
          * @brief
         */
         int _number_of_robots;
+
 
 
         /**
@@ -131,10 +133,12 @@ class PotentialFunction : rclcpp::Node
         double _alpha;
 
 
+
         /**
          * @brief Beta
         */
         double _beta;
+
 
 
         /**
@@ -155,6 +159,13 @@ class PotentialFunction : rclcpp::Node
          * @brief Target positions
         */
         vector<vector<double>> _b_g;
+
+
+
+        /**
+         * @brief Restricted area position
+        */
+        vector<vector<double>> _b_rs;
 };
 
 #endif

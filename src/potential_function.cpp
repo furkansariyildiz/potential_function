@@ -11,6 +11,7 @@ Node("potential_function_node")
 
     _b_i = vector<vector<double>>(_number_of_robots, vector<double>(3));
     _b_g = vector<vector<double>>(_number_of_robots, vector<double>(2));
+    _b_rs = vector<vector<double>>(_number_of_robots, vector<double>(3));
 }
 
 
@@ -54,9 +55,9 @@ void PotentialFunction::calculateAAndB(void)
     
     for(int i=0; i<_number_of_robots; i++)
     {
-        if(_b_i[i][3] != 0)
+        if(_b_i[i][2] != 0)
         {
-            double distance = pow((_b_i[i][0] - _b_g[i][1]), 2) + pow((_b_i[i][1] - _b_g[i][1]), 2);
+            double distance = pow((_b_i[i][0] - _b_g[i][0]), 2) + pow((_b_i[i][1] - _b_g[i][1]), 2);
         
             _alpha = _alpha + distance;
         }
@@ -66,7 +67,47 @@ void PotentialFunction::calculateAAndB(void)
 
     for(int i=0; i<_number_of_robots; i++)
     {
-        
+        if(i != _robot_id)
+        {
+            double distance = -1;
+
+            if(_b_i[i][2] != 0)
+            {
+                // Caution, pow(_b_i[robot_id][2]) process is required?
+                distance = abs(pow((_b_i[_robot_id][0] - _b_i[i][0]), 2) + pow((_b_i[_robot_id][1] - _b_i[i][1]), 2) - pow((_b_i[_robot_id][2] + _b_i[i][2]), 2));
+            }
+            else if(_b_rs[i][2] != 0)
+            {
+                distance = abs(pow((_b_i[_robot_id][0] - _b_rs[i][0]), 2) + pow((_b_i[_robot_id][1] - _b_rs[i][1]), 2) - pow((_b_i[_robot_id][2] + _b_rs[i][2]), 2));
+            }
+
+            if(distance > 0)
+            {
+                _beta = _beta * distance;
+            }
+        }
+    }
+
+    // Calculating beta value for other robots
+    for(int i=0; i<_number_of_robots; i++)
+    {
+        for(int j=i+1; j<_number_of_robots; j++)
+        {
+            if((i!= _robot_id) && (j != _robot_id))
+            {
+                double distance = -1;
+
+                if((_b_i[i][2] != 0) && (_b_i[j][2] != 0))
+                {   
+                    // Caution, pow(_b_i[i][2]) process is required?
+                    distance = abs(pow((_b_i[i][0] - _b_i[j][0]), 2) + pow((_b_i[i][1] - _b_i[j][1]), 2) - pow((_b_i[i][2] + _b_i[j][2]), 2));
+                }
+                else if((_b_rs[i][2] != 0) && (_b_rs[j][2] != 0))
+                {
+                    
+                }
+            }
+        }
     }
 }
 
