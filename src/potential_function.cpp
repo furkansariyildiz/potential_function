@@ -159,6 +159,27 @@ void PotentialFunction::calculateAAndB(void)
 
 void PotentialFunction::calculateDerivativeOfAWithRespectToX(void)
 {
+    _derivative_of_alpha_with_respect_to_x = 2 * (_b_i[_robot_id][0] - _b_g[_robot_id][0]);
+}
+
+
+
+void PotentialFunction::calculateDerivativeOfAWithRespectToY(void)
+{
+    _derivative_of_alpha_with_respect_to_y = 2 *(_b_i[_robot_id][1] - _b_g[_robot_id][1]);
+}
+
+
+
+void PotentialFunction::calculateDerivativeOfBWithRespectToX(void)
+{
+    
+}
+
+
+
+void PotentialFunction::calculateDerivativeOfBWithRespectToY(void)
+{
 
 }
 

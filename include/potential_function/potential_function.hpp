@@ -141,6 +141,34 @@ class PotentialFunction : rclcpp::Node
 
 
         /**
+         * @brief dA/dX
+        */
+        double _derivative_of_alpha_with_respect_to_x;
+
+
+
+        /**
+         * @brief dA/dY
+        */
+        double _derivative_of_alpha_with_respect_to_y;
+
+
+
+        /**
+         * @brief dB/dX
+        */
+        double _derivative_of_beta_with_respect_to_x;
+
+
+
+        /**
+         * @brief dB/dY
+        */
+        double _derivative_of_beta_with_respect_to_y;
+
+
+
+        /**
          * @brief Beta
         */
         double _beta;
@@ -188,6 +216,9 @@ class PotentialFunction : rclcpp::Node
 
 
 
+        /**
+         * @brief Obstacles positions
+        */
         vector<vector<double>> _b_obstacles;
 };
 
