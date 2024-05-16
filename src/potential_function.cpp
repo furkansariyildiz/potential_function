@@ -168,13 +168,24 @@ void PotentialFunction::calculateDerivativeOfBWithRespectToX(void)
     }
 
     // For current robot and boundary
-    double derivative_value_for_each_robot = 0;
+    double derivative_value_for_boundary = (-2 * _b_[_robot_id][0]) / (pow(_radius_outer - _b_[_robot_id][2], 2) - pow(_b_[_robot_id][0], 2) - pow(_b_[_robot_id][1], 2));
+
+    _derivative_of_beta_with_respect_to_x = _derivative_of_beta_with_respect_to_x + derivative_value_for_boundary;
 
     // For current robot and obstacles;
     for(int i=0; i<_number_of_obstacles; i++)
     {
-        
+        double distance = fabs(pow(_b_[_robot_id][0] - _b_obstacles[i][0], 2) + pow(_b_[_robot_id][1] - _b_obstacles[i][1], 2) - pow(_b_[_robot_id][2] + _b_obstacles[i][2], 2));
+
+        if(distance < _limit_distance * _limit_distance)
+        {
+            double derivative_value_for_each_obstacle = 2 * (_b_[_robot_id][0] - _b_obstacles[i][0]) / (pow(_b_[_robot_id][0] - _b_obstacles[i][0], 2) + pow(_b_[_robot_id][1] - _b_obstacles[i][1], 2) - pow(_b_[_robot_id][2] + _b_obstacles[_robot_id][2], 2));
+
+            _derivative_of_beta_with_respect_to_x = _derivative_of_beta_with_respect_to_x + derivative_value_for_each_obstacle;
+        } 
     }
+
+    _derivative_of_beta_with_respect_to_x = _derivative_of_beta_with_respect_to_x * _beta;
 }
 
 
