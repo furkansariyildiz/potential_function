@@ -17,28 +17,30 @@ class PotentialFunction : rclcpp::Node
 
     public:
         /**
-         * @brief
+         * @brief Constructor of PotentialFunction class
         */
         PotentialFunction();
 
 
 
         /**
-         * @brief
+         * @brief Destructor of PotentialFunction class
         */
         ~PotentialFunction();
 
 
 
         /**
-         * @brief
+         * @brief Subscriber for target pose list
         */
         rclcpp::Subscription<potential_function::msg::TargetPoseList>::SharedPtr _target_pose_list_subscriber;
 
 
 
         /**
-         * @brief
+         * @brief Callback function for pose list
+         * @param 
+         * @return void
         */
         void targetPoseListCallback(const potential_function::msg::TargetPoseList::SharedPtr message);
 
@@ -52,7 +54,7 @@ class PotentialFunction : rclcpp::Node
 
 
         /**
-         * @brief Alpha and Beta
+         * @brief Calculating Alpha and Beta values
         */
         void calculateAAndB(void);
 
@@ -100,14 +102,14 @@ class PotentialFunction : rclcpp::Node
 
 
         /**
-         * @brief 
+         * @brief Robot controller function to manipulate cmd_vel topic.
         */
         void robotController(void);
 
 
 
         /**
-         * @brief
+         * @brief dQ/dA
         */
         long double _dQ_division_dA;
 
@@ -121,7 +123,7 @@ class PotentialFunction : rclcpp::Node
 
 
         /**
-         * @brief
+         * @brief Number of robots in environment
         */
         int _number_of_robots;
 
