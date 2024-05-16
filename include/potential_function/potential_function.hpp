@@ -198,7 +198,7 @@ class PotentialFunction : rclcpp::Node
         /**
          * @brief Robot positions
         */
-        vector<vector<double>> _b_i;
+        vector<vector<double>> _b_;
 
 
 

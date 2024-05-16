@@ -9,7 +9,7 @@ Node("potential_function_node")
 {   
     _target_pose_list_subscriber = this->create_subscription<potential_function::msg::TargetPoseList>("/target_pose_list", 1000, bind(&PotentialFunction::targetPoseListCallback, this, placeholders::_1));
 
-    _b_i = vector<vector<double>>(_number_of_robots, vector<double>(3));
+    _b_ = vector<vector<double>>(_number_of_robots, vector<double>(3));
     _b_g = vector<vector<double>>(_number_of_robots, vector<double>(2));
     _b_rs = vector<vector<double>>(_number_of_robots, vector<double>(3));
     _b_obstacles = vector<vector<double>>(_number_of_obstacles, vector<double>(2));
@@ -39,11 +39,11 @@ void PotentialFunction::findRobotsInRange(void)
 {
     for(int robot_id_counter=0; robot_id_counter<_number_of_robots; robot_id_counter++)
     {
-        double distance = sqrt(pow((_b_i[_robot_id][0] - _b_i[robot_id_counter][0]), 2) + pow((_b_i[_robot_id][1] - _b_i[robot_id_counter][1]), 2));
+        double distance = sqrt(pow((_b_[_robot_id][0] - _b_[robot_id_counter][0]), 2) + pow((_b_[_robot_id][1] - _b_[robot_id_counter][1]), 2));
 
         if(distance > _limit_distance)
         {
-            _b_i[robot_id_counter][2] = 0;
+            _b_[robot_id_counter][2] = 0;
         }
     }
 }
@@ -56,9 +56,9 @@ void PotentialFunction::calculateAAndB(void)
     
     for(int i=0; i<_number_of_robots; i++)
     {
-        if(_b_i[i][2] != 0)
+        if(_b_[i][2] != 0)
         {
-            double distance = pow((_b_i[i][0] - _b_g[i][0]), 2) + pow((_b_i[i][1] - _b_g[i][1]), 2);
+            double distance = pow((_b_[i][0] - _b_g[i][0]), 2) + pow((_b_[i][1] - _b_g[i][1]), 2);
         
             _alpha = _alpha + distance;
         }
@@ -72,14 +72,14 @@ void PotentialFunction::calculateAAndB(void)
         {
             double distance = -1;
 
-            if(_b_i[i][2] != 0)
+            if(_b_[i][2] != 0)
             {
-                // Caution, pow(_b_i[robot_id][2]) process is required?
-                distance = abs(pow((_b_i[_robot_id][0] - _b_i[i][0]), 2) + pow((_b_i[_robot_id][1] - _b_i[i][1]), 2) - pow((_b_i[_robot_id][2] + _b_i[i][2]), 2));
+                // Caution, pow(_b_[robot_id][2]) process is required?
+                distance = abs(pow((_b_[_robot_id][0] - _b_[i][0]), 2) + pow((_b_[_robot_id][1] - _b_[i][1]), 2) - pow((_b_[_robot_id][2] + _b_[i][2]), 2));
             }
             else if(_b_rs[i][2] != 0)
             {
-                distance = abs(pow((_b_i[_robot_id][0] - _b_rs[i][0]), 2) + pow((_b_i[_robot_id][1] - _b_rs[i][1]), 2) - pow((_b_i[_robot_id][2] + _b_rs[i][2]), 2));
+                distance = abs(pow((_b_[_robot_id][0] - _b_rs[i][0]), 2) + pow((_b_[_robot_id][1] - _b_rs[i][1]), 2) - pow((_b_[_robot_id][2] + _b_rs[i][2]), 2));
             }
 
             if(distance > 0)
@@ -98,18 +98,18 @@ void PotentialFunction::calculateAAndB(void)
             {
                 double distance = -1;
 
-                if((_b_i[i][2] != 0) && (_b_i[j][2] != 0))
+                if((_b_[i][2] != 0) && (_b_[j][2] != 0))
                 {   
-                    // Caution, pow(_b_i[i][2]) process is required?
-                    distance = abs(pow((_b_i[i][0] - _b_i[j][0]), 2) + pow((_b_i[i][1] - _b_i[j][1]), 2) - pow((_b_i[i][2] + _b_i[j][2]), 2));
+                    // Caution, pow(_b_[i][2]) process is required?
+                    distance = abs(pow((_b_[i][0] - _b_[j][0]), 2) + pow((_b_[i][1] - _b_[j][1]), 2) - pow((_b_[i][2] + _b_[j][2]), 2));
                 }
-                else if((_b_rs[i][2] != 0) && (_b_i[j][2] != 0))
+                else if((_b_rs[i][2] != 0) && (_b_[j][2] != 0))
                 {
-                    distance = abs(pow((_b_rs[i][0] - _b_i[j][0]), 2) + pow((_b_rs[i][1] - _b_i[j][1]), 2) - pow((_b_rs[i][2] + _b_i[j][2]), 2));
+                    distance = abs(pow((_b_rs[i][0] - _b_[j][0]), 2) + pow((_b_rs[i][1] - _b_[j][1]), 2) - pow((_b_rs[i][2] + _b_[j][2]), 2));
                 }
-                else if((_b_i[i][2] != 0) && (_b_rs[j][2] != 0))
+                else if((_b_[i][2] != 0) && (_b_rs[j][2] != 0))
                 {
-                    distance = abs(pow((_b_i[i][0] - _b_rs[j][0]), 2) + pow((_b_i[i][1] - _b_rs[j][1]), 2) - pow((_b_i[i][2] + _b_rs[j][2]), 2));
+                    distance = abs(pow((_b_[i][0] - _b_rs[j][0]), 2) + pow((_b_[i][1] - _b_rs[j][1]), 2) - pow((_b_[i][2] + _b_rs[j][2]), 2));
                 }
                 else if((_b_rs[i][2] != 0) && (_b_rs[j][2] != 0))
                 {
@@ -126,7 +126,7 @@ void PotentialFunction::calculateAAndB(void)
     // Calculating beta for obstacles relative to current robot
     for(int i=0; i<_number_of_obstacles; i++)
     {
-        double distance = abs(pow((_b_i[_robot_id][0] - _b_obstacles[i][0]), 2) + pow((_b_i[_robot_id][1] - _b_obstacles[i][1]), 2) - pow((_b_i[_robot_id][2] - _b_obstacles[i][2]), 2));
+        double distance = abs(pow((_b_[_robot_id][0] - _b_obstacles[i][0]), 2) + pow((_b_[_robot_id][1] - _b_obstacles[i][1]), 2) - pow((_b_[_robot_id][2] - _b_obstacles[i][2]), 2));
 
         if(distance < _limit_distance_for_obstacles)
         {
@@ -139,9 +139,9 @@ void PotentialFunction::calculateAAndB(void)
     {
         double distance = -1;
         
-        if(_b_i[i][2] != 0)
+        if(_b_[i][2] != 0)
         {
-            distance = abs(pow((_radius_outer - _b_i[i][2]), 2) - pow(_b_i[i][0], 2) - pow(_b_i[i][1], 2));
+            distance = abs(pow((_radius_outer - _b_[i][2]), 2) - pow(_b_[i][0], 2) - pow(_b_[i][1], 2));
         }
         else if(_b_rs[i][2] != 0)
         {
@@ -159,14 +159,14 @@ void PotentialFunction::calculateAAndB(void)
 
 void PotentialFunction::calculateDerivativeOfAWithRespectToX(void)
 {
-    _derivative_of_alpha_with_respect_to_x = 2 * (_b_i[_robot_id][0] - _b_g[_robot_id][0]);
+    _derivative_of_alpha_with_respect_to_x = 2 * (_b_[_robot_id][0] - _b_g[_robot_id][0]);
 }
 
 
 
 void PotentialFunction::calculateDerivativeOfAWithRespectToY(void)
 {
-    _derivative_of_alpha_with_respect_to_y = 2 *(_b_i[_robot_id][1] - _b_g[_robot_id][1]);
+    _derivative_of_alpha_with_respect_to_y = 2 *(_b_[_robot_id][1] - _b_g[_robot_id][1]);
 }
 
 
