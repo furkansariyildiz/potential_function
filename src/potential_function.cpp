@@ -151,7 +151,8 @@ void PotentialFunction::calculateDerivativeOfAWithRespectToY(void)
 void PotentialFunction::calculateDerivativeOfBWithRespectToX(void)
 {
     _derivative_of_beta_with_respect_to_x = 0;
-    
+
+    // For current robot and other robots    
     for(int i=0; i<_number_of_robots; i++)
     {
         if(i != _robot_id)
@@ -164,6 +165,15 @@ void PotentialFunction::calculateDerivativeOfBWithRespectToX(void)
                 _derivative_of_beta_with_respect_to_x = _derivative_of_beta_with_respect_to_x + derivative_value_for_each_robot;
             }
         }
+    }
+
+    // For current robot and boundary
+    double derivative_value_for_each_robot = 0;
+
+    // For current robot and obstacles;
+    for(int i=0; i<_number_of_obstacles; i++)
+    {
+        
     }
 }
 
