@@ -210,13 +210,6 @@ class PotentialFunction : rclcpp::Node
 
 
         /**
-         * @brief Restricted area position
-        */
-        vector<vector<double>> _b_rs;
-
-
-
-        /**
          * @brief Obstacles positions
         */
         vector<vector<double>> _b_obstacles;
