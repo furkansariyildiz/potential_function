@@ -136,9 +136,37 @@ class PotentialFunction : rclcpp::Node
 
 
         /**
-         * @brief Alpha
+         * @brief Alpha (A)
         */
         double _alpha;
+
+
+
+        /**
+         * @brief Beta (B)
+        */
+        double _beta;
+
+
+
+        /**
+         * @brief Gama (Q)
+        */
+        double _gama;
+
+
+
+        /**
+         * @brief Fx
+        */
+        double _control_input_for_x;
+
+
+
+        /**
+         * @brief Fy
+        */
+        double _control_input_for_y;
 
 
 
@@ -171,10 +199,50 @@ class PotentialFunction : rclcpp::Node
 
 
         /**
-         * @brief Beta
+         * @brief dQ/dX
         */
-        double _beta;
+        double _derivative_of_gama_with_respect_to_x;
 
+
+
+        /**
+         * @brief dQ/dY
+        */
+        double _derivative_of_gama_with_respect_to_y;
+
+
+
+        /**
+         * @brief dQ/dA
+        */
+        double _derivative_of_gama_with_respect_to_alpha;
+
+
+
+        /**
+         * @brief dQ/dB
+        */
+        double _derivative_of_gama_with_respect_to_beta;
+
+
+
+        /**
+         * @brief dF/dX
+        */
+        double _derivative_of_f_with_respect_to_x;
+
+
+
+        /**
+         * @brief dF/dY
+        */
+        double _derivative_of_f_with_respect_to_y;
+
+
+        /**
+         * @brief Parameter for potential function.
+        */
+        int _K_gain;
 
 
         /**

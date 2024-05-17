@@ -232,6 +232,26 @@ void PotentialFunction::calculateDerivativeOfBWithRespectToY(void)
 
 
 
+void PotentialFunction::calculateDerivativeOfFWithRespectToX(void)
+{   
+    /** Q = A^k / B **/
+    _gama = pow(_alpha, _K_gain) / _beta;
+
+    /** dQ/dA = k * A^(k-1) / B **/
+    _derivative_of_gama_with_respect_to_alpha = _K_gain * pow(_alpha, _K_gain - 1) / _beta;
+
+    /** dQ/dB = -1 * A^k / B^2 **/
+    _derivative_of_gama_with_respect_to_beta = -1 * pow(_alpha, _K_gain) / pow(_beta, 2);
+
+    /** dQ/dX = dQ/dA * dA/dX + dQ/dB * dB/dX **/
+    _derivative_of_gama_with_respect_to_x = _derivative_of_gama_with_respect_to_alpha * _derivative_of_alpha_with_respect_to_x + _derivative_of_gama_with_respect_to_beta * _derivative_of_beta_with_respect_to_x;
+
+    /** dF/dX = 1/k * (Q / (1 + Q))^(1/k - 1) * (1 + Q)^-2 * dQ/dX **/
+    _derivative_of_f_with_respect_to_x = (1 / _K_gain) * pow((_gama / (1 + _gama)), (1 / _K_gain - 1)) * pow((1 + _gama), -2) * _derivative_of_gama_with_respect_to_x; 
+}
+
+
+
 int main(int argc, char *argv[])
 {
     return 0;
