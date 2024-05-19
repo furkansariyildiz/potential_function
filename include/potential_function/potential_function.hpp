@@ -38,6 +38,13 @@ class PotentialFunction: public rclcpp::Node
 
 
         /**
+         * @brief Timer for main loop (robot controller)
+        */
+        rclcpp::TimerBase::SharedPtr _robot_controller_timer;
+
+
+
+        /**
          * @brief Callback function for pose list
          * @param 
          * @return void
@@ -56,34 +63,34 @@ class PotentialFunction: public rclcpp::Node
         /**
          * @brief Calculating Alpha and Beta values
         */
-        void calculateAAndB(void);
+        void calculateAlphaAndBeta(void);
 
 
         
         /**
          * @brief dA/dX
         */
-        void calculateDerivativeOfAWithRespectToX(void);
+        void calculateDerivativeOfAlphaWithRespectToX(void);
 
 
 
         /**
          * @brief dA/dY
         */
-        void calculateDerivativeOfAWithRespectToY(void);
+        void calculateDerivativeOfAlphaWithRespectToY(void);
 
 
 
         /**
          * @brief dB/dX
         */
-        void calculateDerivativeOfBWithRespectToX(void);
+        void calculateDerivativeOfBetaWithRespectToX(void);
         
 
         /**
          * @brief dB/dY
         */
-        void calculateDerivativeOfBWithRespectToY(void);
+        void calculateDerivativeOfBetaWithRespectToY(void);
 
 
 
