@@ -11,7 +11,7 @@ using namespace std;
 
 
 
-class PotentialFunction : rclcpp::Node
+class PotentialFunction: public rclcpp::Node
 {
     private:
 

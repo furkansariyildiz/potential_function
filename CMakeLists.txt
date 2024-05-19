@@ -17,7 +17,7 @@ include_directories(include ${BOOST_INCLUDE_DIRS})
 rosidl_generate_interfaces(${PROJECT_NAME}_msgs
   "msg/TargetPose.msg"
   "msg/TargetPoseList.msg"
-  DEPENDENCIES builtin_interfaces std_msgs
+  DEPENDENCIES builtin_interfaces std_msgs geometry_msgs
 )
 
 add_executable(potential_function src/potential_function.cpp)

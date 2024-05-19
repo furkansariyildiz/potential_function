@@ -1,3 +1,3 @@
 std_msgs/Header header
-float64 robot_id
+int32 robot_id
 geometry_msgs/Pose target_pose
