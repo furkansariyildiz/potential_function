@@ -20,3 +20,6 @@ colcon build --symlink-install --packages-select potential_function
 ```bash
 ros2 launch potential_function potential_function.launch.py
 ```
+
+### Multirobot guideline
+https://medium.com/@arshad.mehmood/efficient-deployment-and-operation-of-multiple-turtlebot3-robots-in-gazebos-f72f6a364620
