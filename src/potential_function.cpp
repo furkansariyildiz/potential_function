@@ -18,10 +18,6 @@ Node("potential_function_node")
     _number_of_robots = this->get_parameter("number_of_robots").as_int();
     _number_of_obstacles = this->get_parameter("number_of_obstacles").as_int();
     _K_gain = this->get_parameter("K_gain").as_int();
-
-    _b_ = vector<vector<double>>(_number_of_robots, vector<double>(3, 0.0));
-    _b_g = vector<vector<double>>(_number_of_robots, vector<double>(2, 0.0));
-    _b_obstacles = vector<vector<double>>(_number_of_obstacles, vector<double>(2, 0.0));
 }
 
 
@@ -283,6 +279,12 @@ void PotentialFunction::calculateDerivativeOfFWithRespectToY(void)
 
 void PotentialFunction::robotController(void)
 {
+    _b_ = vector<vector<double>>(_number_of_robots, vector<double>(3, 0.0));
+    _b_g = vector<vector<double>>(_number_of_robots, vector<double>(2, 0.0));
+    _b_obstacles = vector<vector<double>>(_number_of_obstacles, vector<double>(2, 0.0));
+
+    findRobotsInRange();
+
     calculateAlphaAndBeta();
     calculateDerivativeOfAlphaWithRespectToX();
     calculateDerivativeOfBetaWithRespectToX();
@@ -298,6 +300,7 @@ void PotentialFunction::robotController(void)
 
     RCLCPP_INFO_STREAM(this->get_logger(), "b_out_x: " << b_out_x);
     RCLCPP_INFO_STREAM(this->get_logger(), "b_out_y: " << b_out_y);
+    RCLCPP_INFO_STREAM(this->get_logger(), "----------------------------" << endl);
 }
 
 
