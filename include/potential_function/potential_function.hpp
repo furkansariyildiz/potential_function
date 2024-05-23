@@ -5,6 +5,8 @@
 #include <rclcpp/time.hpp>
 #include <iostream>
 #include <potential_function/msg/target_pose_list.hpp>
+#include <nav_msgs/msg/odometry.hpp>
+#include "subscriber_info.hpp"
 // #include <mpfr.hpp>
 
 using namespace std;
@@ -112,6 +114,13 @@ class PotentialFunction: public rclcpp::Node
          * @brief Robot controller function to manipulate cmd_vel topic.
         */
         void robotController(void);
+
+
+
+        /**
+         * @brief Dynamic subscriber info 
+        */
+        SubscriberInfo _subscriber_info;
 
 
 
