@@ -1,0 +1,4 @@
+/potential_function_node:
+  ros__parameters:
+    name_of_robots: ["/tb0_0", "/tb0_1"]
+    odom_topic: "odom"
