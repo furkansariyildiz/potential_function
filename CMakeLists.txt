@@ -10,19 +10,22 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(builtin_interfaces REQUIRED)
 find_package(geometry_msgs REQUIRED)
+find_package(nav_msgs REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 
 include_directories(include ${BOOST_INCLUDE_DIRS})
 
 rosidl_generate_interfaces(${PROJECT_NAME}_msgs
+  "msg/RobotPosition.msg"
+  "msg/RobotsPositionList.msg"
   "msg/TargetPose.msg"
   "msg/TargetPoseList.msg"
-  DEPENDENCIES builtin_interfaces std_msgs geometry_msgs
+  DEPENDENCIES builtin_interfaces std_msgs geometry_msgs nav_msgs
 )
 
 add_executable(potential_function src/potential_function.cpp)
 target_link_libraries(potential_function ${catkin_LIBRARIES})
-ament_target_dependencies(potential_function rclcpp std_msgs)
+ament_target_dependencies(potential_function rclcpp std_msgs nav_msgs)
 
 install(TARGETS
         potential_function
