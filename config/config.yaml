@@ -1,5 +1,5 @@
 /potential_function_node:
   ros__parameters:
-    number_of_robots: 10
+    current_robot_id: 0
     number_of_obstacles: 0
     K_gain: 1
