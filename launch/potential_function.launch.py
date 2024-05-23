@@ -13,6 +13,8 @@ def generate_launch_description():
             output='screen',
             parameters=[os.path.join(
                 get_package_share_directory('potential_function'),
-                'config', 'config.yaml')]
+                'config', 'config.yaml'), 
+                os.path.join(get_package_share_directory('potential_function'),
+                'config', 'topics.yaml')]
         )
     ])
