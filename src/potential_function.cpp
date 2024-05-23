@@ -11,19 +11,21 @@ Node("potential_function_node")
 
     _robot_controller_timer = this->create_wall_timer(1ms, bind(&PotentialFunction::robotController, this));
 
-    declare_parameter("number_of_robots", 100);
     declare_parameter("number_of_obstacles", 100);
     declare_parameter("K_gain", 1);
     declare_parameter("name_of_robots", vector<string>{"tb1", "tb2"});
     declare_parameter("odom_topic", "odom");
 
-
-    _number_of_robots = this->get_parameter("number_of_robots").as_int();
     _number_of_obstacles = this->get_parameter("number_of_obstacles").as_int();
     _K_gain = this->get_parameter("K_gain").as_int();
     _name_of_robots = this->get_parameter("name_of_robots").as_string_array();
     _odom_topic_name = this->get_parameter("odom_topic").as_string();
     
+    _number_of_robots = _name_of_robots.size();
+
+    _b_ = vector<vector<double>>(_number_of_robots, vector<double>(3, 0.0));
+    _b_g = vector<vector<double>>(_number_of_robots, vector<double>(2, 0.0));
+    _b_obstacles = vector<vector<double>>(_number_of_obstacles, vector<double>(2, 0.0));
 
     for(int i=0; i<_name_of_robots.size(); i++)
     {
@@ -32,12 +34,12 @@ Node("potential_function_node")
         
         unsigned int topic_index = _dynamic_subscribers.size();
         _topic_to_index[topic] = topic_index;
-        
-        RCLCPP_INFO_STREAM(this->get_logger(), "Odom topic name: " << topic << endl);
 
-        subscriber_info._subscriber = this->create_subscription<nav_msgs::msg::Odometry>(topic, 1000, [this, topic_index](const nav_msgs::msg::Odometry::SharedPtr message) 
+        vector<string> robot_description = getRobotID(topic);
+
+        subscriber_info._subscriber = this->create_subscription<nav_msgs::msg::Odometry>(topic, 1000, [this, topic_index, robot_description](const nav_msgs::msg::Odometry::SharedPtr message) 
         {
-            this->dynamicOdometryCallback(message, topic_index);
+            this->dynamicOdometryCallback(message, topic_index, stoi(robot_description[1]));
         });
 
         subscriber_info._process = true;
@@ -66,12 +68,35 @@ void PotentialFunction::targetPoseListCallback(const potential_function::msg::Ta
 
 
 
-void PotentialFunction::dynamicOdometryCallback(const nav_msgs::msg::Odometry::SharedPtr message, unsigned int topic_index)
+void PotentialFunction::dynamicOdometryCallback(const nav_msgs::msg::Odometry::SharedPtr message, unsigned int topic_index, int robot_id)
 {
     if(_dynamic_subscribers[topic_index]._process == true)
     {
+        RCLCPP_INFO_STREAM(this->get_logger(), "Robot id: " << robot_id);
         RCLCPP_INFO_STREAM(this->get_logger(), "Dynamic topic index: " << topic_index << endl);
+
+        _b_[robot_id][0] = message->pose.pose.position.x;
+        _b_[robot_id][1] = message->pose.pose.position.y;
     }
+}
+
+
+
+vector<string> PotentialFunction::getRobotID(const string &topic_name)
+{
+    vector<string> result;
+    regex re(R"(/([a-zA-Z]+)_([0-9]+)_([0-9]+)/)");
+    smatch match;
+
+    if(regex_search(topic_name, match, re) && match.size() > 3)
+    {    
+        result.push_back(match[1].str());
+        result.push_back(match[2].str());
+        result.push_back(match[3].str());
+
+    }
+
+    return result;
 }
 
 
@@ -315,10 +340,6 @@ void PotentialFunction::calculateDerivativeOfFWithRespectToY(void)
 
 void PotentialFunction::robotController(void)
 {
-    _b_ = vector<vector<double>>(_number_of_robots, vector<double>(3, 0.0));
-    _b_g = vector<vector<double>>(_number_of_robots, vector<double>(2, 0.0));
-    _b_obstacles = vector<vector<double>>(_number_of_obstacles, vector<double>(2, 0.0));
-
     findRobotsInRange();
 
     calculateAlphaAndBeta();

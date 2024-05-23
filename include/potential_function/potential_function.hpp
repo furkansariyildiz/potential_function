@@ -7,6 +7,7 @@
 #include <potential_function/msg/target_pose_list.hpp>
 #include <nav_msgs/msg/odometry.hpp>
 #include "subscriber_info.hpp"
+#include <regex>
 // #include <mpfr.hpp>
 
 using namespace std;
@@ -59,7 +60,16 @@ class PotentialFunction: public rclcpp::Node
          * @param
          * @param
         */
-        void dynamicOdometryCallback(const nav_msgs::msg::Odometry::SharedPtr message, unsigned int topic_index);
+        void dynamicOdometryCallback(const nav_msgs::msg::Odometry::SharedPtr message, unsigned int topic_index, int robot_id);
+
+
+
+        /**
+         * @brief
+         * @param
+         * @return
+        */
+        vector<string> getRobotID(const string &topic_name);
 
 
 
