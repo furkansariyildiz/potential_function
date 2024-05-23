@@ -14,10 +14,36 @@ Node("potential_function_node")
     declare_parameter("number_of_robots", 100);
     declare_parameter("number_of_obstacles", 100);
     declare_parameter("K_gain", 1);
+    declare_parameter("name_of_robots", vector<string>{"tb1", "tb2"});
+    declare_parameter("odom_topic", "odom");
+
 
     _number_of_robots = this->get_parameter("number_of_robots").as_int();
     _number_of_obstacles = this->get_parameter("number_of_obstacles").as_int();
     _K_gain = this->get_parameter("K_gain").as_int();
+    _name_of_robots = this->get_parameter("name_of_robots").as_string_array();
+    _odom_topic_name = this->get_parameter("odom_topic").as_string();
+    
+
+    for(int i=0; i<_name_of_robots.size(); i++)
+    {
+        SubscriberInfo subscriber_info;
+        string topic = _name_of_robots[i] + "/" + _odom_topic_name;
+        
+        unsigned int topic_index = _dynamic_subscribers.size();
+        _topic_to_index[topic] = topic_index;
+        
+        RCLCPP_INFO_STREAM(this->get_logger(), "Odom topic name: " << topic << endl);
+
+        subscriber_info._subscriber = this->create_subscription<nav_msgs::msg::Odometry>(topic, 1000, [this, topic_index](const nav_msgs::msg::Odometry::SharedPtr message) 
+        {
+            this->dynamicOdometryCallback(message, topic_index);
+        });
+
+        subscriber_info._process = true;
+
+        _dynamic_subscribers.push_back(subscriber_info);
+    }
 }
 
 
@@ -35,6 +61,16 @@ void PotentialFunction::targetPoseListCallback(const potential_function::msg::Ta
     {
         _b_g[message->target_pose_list[i].robot_id][0] = message->target_pose_list[i].target_pose.position.x;
         _b_g[message->target_pose_list[i].robot_id][1] = message->target_pose_list[i].target_pose.position.y;
+    }
+}
+
+
+
+void PotentialFunction::dynamicOdometryCallback(const nav_msgs::msg::Odometry::SharedPtr message, unsigned int topic_index)
+{
+    if(_dynamic_subscribers[topic_index]._process == true)
+    {
+        RCLCPP_INFO_STREAM(this->get_logger(), "Dynamic topic index: " << topic_index << endl);
     }
 }
 
@@ -298,9 +334,9 @@ void PotentialFunction::robotController(void)
     double b_out_x = -1 * _derivative_of_f_with_respect_to_x;
     double b_out_y = -1 * _derivative_of_f_with_respect_to_y;
 
-    RCLCPP_INFO_STREAM(this->get_logger(), "b_out_x: " << b_out_x);
-    RCLCPP_INFO_STREAM(this->get_logger(), "b_out_y: " << b_out_y);
-    RCLCPP_INFO_STREAM(this->get_logger(), "----------------------------" << endl);
+    // RCLCPP_INFO_STREAM(this->get_logger(), "b_out_x: " << b_out_x);
+    // RCLCPP_INFO_STREAM(this->get_logger(), "b_out_y: " << b_out_y);
+    // RCLCPP_INFO_STREAM(this->get_logger(), "----------------------------" << endl);
 }
 
 

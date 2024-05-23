@@ -49,9 +49,17 @@ class PotentialFunction: public rclcpp::Node
         /**
          * @brief Callback function for pose list
          * @param 
-         * @return void
         */
         void targetPoseListCallback(const potential_function::msg::TargetPoseList::SharedPtr message);
+
+
+
+        /**
+         * @brief
+         * @param
+         * @param
+        */
+        void dynamicOdometryCallback(const nav_msgs::msg::Odometry::SharedPtr message, unsigned int topic_index);
 
 
 
@@ -118,9 +126,16 @@ class PotentialFunction: public rclcpp::Node
 
 
         /**
-         * @brief Dynamic subscriber info 
+         * @brief Dynamic subscribers info 
         */
-        SubscriberInfo _subscriber_info;
+        vector<SubscriberInfo> _dynamic_subscribers;
+
+
+
+        /**
+         * @brief Mapping topics via string to value unsigned int.
+        */
+        map<string, unsigned int> _topic_to_index;
 
 
 
@@ -299,6 +314,19 @@ class PotentialFunction: public rclcpp::Node
          * @brief Obstacles positions
         */
         vector<vector<double>> _b_obstacles;
+
+
+
+        /**
+         * @brief Name of the robots dynamic subscriber.
+        */
+        vector<string> _name_of_robots;
+
+
+        /**
+         * @brief Name of the odom topics for dynamic subscriber.
+        */
+        string _odom_topic_name;
 };
 
 #endif
