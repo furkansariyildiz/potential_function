@@ -2,4 +2,5 @@
   ros__parameters:
     current_robot_id: 0
     number_of_obstacles: 0
+    limit_distance_for_robots: 10.0
     K_gain: 1
