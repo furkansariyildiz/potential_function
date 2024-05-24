@@ -1,0 +1,9 @@
+/target_pose_list_publisher_node:
+  ros__parameters:
+    tb_0_0: 
+      x: 2.0
+      y: 2.0
+
+    tb_1_0:
+      x: -2.0
+      y: -2.0
