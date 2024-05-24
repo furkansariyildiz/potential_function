@@ -11,15 +11,19 @@ Node("potential_function_node")
 
     _robot_controller_timer = this->create_wall_timer(1ms, bind(&PotentialFunction::robotController, this));
 
+    declare_parameter("current_robot_id", 0);
     declare_parameter("number_of_obstacles", 100);
+    declare_parameter("radius_of_robots", 1.0);
     declare_parameter("limit_distance_for_robots", 1.0);
     declare_parameter("K_gain", 1);
     declare_parameter("name_of_robots", vector<string>{"tb1", "tb2"});
     declare_parameter("odom_topic", "odom");
 
+    _robot_id = this->get_parameter("current_robot_id").as_int();
     _number_of_obstacles = this->get_parameter("number_of_obstacles").as_int();
-    _K_gain = this->get_parameter("K_gain").as_int();
+    _radius_of_robots = this->get_parameter("radius_of_robots").as_double();
     _limit_distance = this->get_parameter("limit_distance_for_robots").as_double();
+    _K_gain = this->get_parameter("K_gain").as_int();
     _name_of_robots = this->get_parameter("name_of_robots").as_string_array();
     _odom_topic_name = this->get_parameter("odom_topic").as_string();
     
@@ -113,6 +117,10 @@ void PotentialFunction::findRobotsInRange(void)
         if(distance > _limit_distance)
         {
             _b_[robot_id_counter][2] = 0;
+        }
+        else
+        {
+            _b_[robot_id_counter][2] = _radius_of_robots;
         }
     }
 }
@@ -229,7 +237,7 @@ void PotentialFunction::calculateDerivativeOfBetaWithRespectToX(void)
         {
             double derivative_value_for_each_robot;
 
-            if(_b_[i][3] != 0)
+            if(_b_[i][2] != 0)
             {
                 derivative_value_for_each_robot = 2 * (_b_[_robot_id][0] - _b_[i][0]) / (pow((_b_[_robot_id][0] - _b_[i][0]), 2) + pow(_b_[_robot_id][1] - _b_[i][1], 2) - pow(_b_[_robot_id][2] + _b_[i][2], 2));
                 _derivative_of_beta_with_respect_to_x = _derivative_of_beta_with_respect_to_x + derivative_value_for_each_robot;
@@ -271,7 +279,7 @@ void PotentialFunction::calculateDerivativeOfBetaWithRespectToY(void)
         {
             double derivative_value_for_each_robot;
 
-            if(_b_[i][3] != 0)
+            if(_b_[i][2] != 0)
             {
                 derivative_value_for_each_robot = 2 * (_b_[_robot_id][1] - _b_[i][1]) / (pow(_b_[_robot_id][0] - _b_[i][0], 2) + pow(_b_[_robot_id][1] - _b_[i][1], 2) - pow(_b_[_robot_id][2] + _b_[i][2], 2));
                 _derivative_of_beta_with_respect_to_y = _derivative_of_beta_with_respect_to_y + derivative_value_for_each_robot;
@@ -358,11 +366,12 @@ void PotentialFunction::robotController(void)
     double b_out_x = -1 * _derivative_of_f_with_respect_to_x;
     double b_out_y = -1 * _derivative_of_f_with_respect_to_y;
 
-    RCLCPP_INFO_STREAM(this->get_logger(), "_b_[i][2]: " << _b_[1][2]);
+    RCLCPP_INFO_STREAM(this->get_logger(), "_b_[0][2]: " << _b_[0][2]);
+    RCLCPP_INFO_STREAM(this->get_logger(), "_b_[1][2]: " << _b_[1][2]);
 
-    // RCLCPP_INFO_STREAM(this->get_logger(), "b_out_x: " << b_out_x);
-    // RCLCPP_INFO_STREAM(this->get_logger(), "b_out_y: " << b_out_y);
-    // RCLCPP_INFO_STREAM(this->get_logger(), "----------------------------" << endl);
+    RCLCPP_INFO_STREAM(this->get_logger(), "b_out_x: " << b_out_x);
+    RCLCPP_INFO_STREAM(this->get_logger(), "b_out_y: " << b_out_y);
+    RCLCPP_INFO_STREAM(this->get_logger(), "----------------------------" << endl);
 }
 
 

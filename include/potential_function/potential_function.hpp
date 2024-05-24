@@ -306,6 +306,14 @@ class PotentialFunction: public rclcpp::Node
         double _radius_outer;
 
 
+
+        /**
+         * @brief Radius of each robots
+        */
+        double _radius_of_robots;
+
+
+
         /**
          * @brief Robot positions
         */
