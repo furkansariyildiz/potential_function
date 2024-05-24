@@ -6,15 +6,26 @@ from ament_index_python.packages import get_package_share_directory
 
 def generate_launch_description():
     return LaunchDescription([
+        # Node(
+        #     package='potential_function',
+        #     executable='potential_function',
+        #     name='potential_function_node',
+        #     output='screen',
+        #     parameters=[os.path.join(
+        #         get_package_share_directory('potential_function'),
+        #         'config', 'config.yaml'), 
+        #         os.path.join(get_package_share_directory('potential_function'),
+        #         'config', 'topics.yaml')]
+        # ),
         Node(
             package='potential_function',
-            executable='potential_function',
-            name='potential_function_node',
+            executable='target_pose_list_publisher.py',
+            name='target_pose_list_publisher_node',
             output='screen',
-            parameters=[os.path.join(
-                get_package_share_directory('potential_function'),
-                'config', 'config.yaml'), 
-                os.path.join(get_package_share_directory('potential_function'),
-                'config', 'topics.yaml')]
+            parameters=[
+                os.path.join(
+                    get_package_share_directory('potential_function'),
+                    'config', 'target_pose_list.yaml'
+                )]
         )
     ])

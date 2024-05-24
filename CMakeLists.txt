@@ -7,7 +7,9 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
+find_package(ament_cmake_python REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(rclpy REQUIRED)
 find_package(builtin_interfaces REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
@@ -27,6 +29,8 @@ add_executable(potential_function src/potential_function.cpp)
 target_link_libraries(potential_function ${catkin_LIBRARIES})
 ament_target_dependencies(potential_function rclcpp std_msgs nav_msgs)
 
+ament_python_install_package(scripts)
+
 install(TARGETS
         potential_function
         DESTINATION lib/${PROJECT_NAME}
@@ -36,6 +40,11 @@ install(DIRECTORY
         launch
         config
         DESTINATION share/${PROJECT_NAME}/
+)
+
+install(PROGRAMS
+        scripts/target_pose_list_publisher.py
+        DESTINATION lib/${PROJECT_NAME}
 )
 
 # This is for Galactic or Foxy 
