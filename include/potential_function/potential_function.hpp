@@ -283,7 +283,7 @@ class PotentialFunction: public rclcpp::Node
         /**
          * @brief Parameter for potential function.
         */
-        int _K_gain;
+        double _K_gain;
 
 
         /**

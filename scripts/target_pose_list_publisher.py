@@ -32,7 +32,6 @@ class TargetPoseListPublisher(Node):
         target_pose_list = TargetPoseList()
 
         for parameter_name in parameter_names:
-            self.get_logger().info("Param names: " + str(parameter_names))
             if parameter_name.startswith('tb_'):
                 base_name = parameter_name[:-2]  # remove '.x' or '.y'
                 if base_name not in parameter_pairs:
