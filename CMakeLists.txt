@@ -12,6 +12,7 @@ find_package(rclcpp REQUIRED)
 find_package(rclpy REQUIRED)
 find_package(builtin_interfaces REQUIRED)
 find_package(geometry_msgs REQUIRED)
+find_package(tf2 REQUIRED)
 find_package(nav_msgs REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 
@@ -27,7 +28,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}_msgs
 
 add_executable(potential_function src/potential_function.cpp)
 target_link_libraries(potential_function ${catkin_LIBRARIES})
-ament_target_dependencies(potential_function rclcpp std_msgs nav_msgs)
+ament_target_dependencies(potential_function rclcpp std_msgs nav_msgs tf2)
 
 ament_python_install_package(scripts)
 
