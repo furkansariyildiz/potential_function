@@ -1,6 +1,8 @@
 #ifndef POTENTIAL_FUNCTION_HPP
 #define POTENTIAL_FUNCTION_HPP
 
+#define PI 3.141592653589793238462
+
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp/time.hpp>
 #include <iostream>
@@ -153,6 +155,13 @@ class PotentialFunction: public rclcpp::Node
          * @brief dQ/dA
         */
         long double _dQ_division_dA;
+
+
+
+        /**
+         * @brief Velocity vector to get desired heading 
+        */
+        double _desired_heading;
 
 
 

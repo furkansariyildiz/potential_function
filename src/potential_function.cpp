@@ -366,6 +366,12 @@ void PotentialFunction::robotController(void)
 
     RCLCPP_INFO_STREAM(this->get_logger(), "b_out_x: " << b_out_x);
     RCLCPP_INFO_STREAM(this->get_logger(), "b_out_y: " << b_out_y);
+
+    _desired_heading = atan2(b_out_y, b_out_x);
+
+    _desired_heading = atan2(sin(_desired_heading), cos(_desired_heading));
+
+    RCLCPP_INFO_STREAM(this->get_logger(), "Desired Heading: " << _desired_heading * 180 / PI );
     RCLCPP_INFO_STREAM(this->get_logger(), "----------------------------");
 }
 
