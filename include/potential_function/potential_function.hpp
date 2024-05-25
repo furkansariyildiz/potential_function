@@ -5,11 +5,18 @@
 
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp/time.hpp>
+
+#include <tf2/LinearMath/Quaternion.h>
+#include <tf2/LinearMath/Matrix3x3.h>
+
 #include <iostream>
+#include <regex>
+
 #include <potential_function/msg/target_pose_list.hpp>
 #include <nav_msgs/msg/odometry.hpp>
+#include <geometry_msgs/msg/twist.hpp>
+
 #include "subscriber_info.hpp"
-#include <regex>
 // #include <mpfr.hpp>
 
 using namespace std;
@@ -39,6 +46,12 @@ class PotentialFunction: public rclcpp::Node
          * @brief Subscriber for target pose list
         */
         rclcpp::Subscription<potential_function::msg::TargetPoseList>::SharedPtr _target_pose_list_subscriber;
+
+
+        /**
+         * @biref Publisher for velocity command
+        */
+        rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr _cmd_vel_publisher;
 
 
 
@@ -131,6 +144,18 @@ class PotentialFunction: public rclcpp::Node
 
 
         /**
+         * @brief PID controller to get control input
+         * @param
+         * @param
+         * @param
+         * @param
+         * @return control_input
+        */
+        double PIDController(double Kp, double Ki, double Kd, double error_threshold, double error_signal);
+
+
+
+        /**
          * @brief Robot controller function to manipulate cmd_vel topic.
         */
         void robotController(void);
@@ -148,6 +173,13 @@ class PotentialFunction: public rclcpp::Node
          * @brief Mapping topics via string to value unsigned int.
         */
         map<string, unsigned int> _topic_to_index;
+
+
+
+        /**
+         * @brief Velocity Command message for current robot.
+        */
+        geometry_msgs::msg::Twist _cmd_vel_message;
 
 
 
@@ -295,6 +327,13 @@ class PotentialFunction: public rclcpp::Node
         double _K_gain;
 
 
+
+        /**
+         * @brief Gain parameters for angular velocity 
+        */
+        double _Kp_w, _Ki_w, _Kd_w;
+
+
         /**
          * @brief Limit for distance between current robot and other robots.
         */
@@ -327,6 +366,13 @@ class PotentialFunction: public rclcpp::Node
          * @brief Robot positions
         */
         vector<vector<double>> _b_;
+
+
+
+        /**
+         * @brief Robot RPY (roll, pitch, yaw) 
+        */
+        vector<vector<double>> _b_rpy;
 
 
 

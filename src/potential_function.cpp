@@ -9,13 +9,18 @@ Node("potential_function_node")
 {   
     _target_pose_list_subscriber = this->create_subscription<potential_function::msg::TargetPoseList>("/target_pose_list", 1000, bind(&PotentialFunction::targetPoseListCallback, this, placeholders::_1));
 
-    _robot_controller_timer = this->create_wall_timer(1ms, bind(&PotentialFunction::robotController, this));
+    _cmd_vel_publisher = this->create_publisher<geometry_msgs::msg::Twist>("/tb_0_0/cmd_vel", 10);
+
+    _robot_controller_timer = this->create_wall_timer(10ms, bind(&PotentialFunction::robotController, this));
 
     declare_parameter("current_robot_id", 0);
     declare_parameter("number_of_obstacles", 100);
     declare_parameter("radius_of_robots", 1.0);
     declare_parameter("limit_distance_for_robots", 1.0);
     declare_parameter("K_gain", 0.5);
+    declare_parameter("Kp_w", 0.5);
+    declare_parameter("Ki_w", 0.01);
+    declare_parameter("Kd_w", 0.01);
     declare_parameter("name_of_robots", vector<string>{"tb1", "tb2"});
     declare_parameter("odom_topic", "odom");
 
@@ -24,12 +29,16 @@ Node("potential_function_node")
     _radius_of_robots = this->get_parameter("radius_of_robots").as_double();
     _limit_distance = this->get_parameter("limit_distance_for_robots").as_double();
     _K_gain = this->get_parameter("K_gain").as_double();
+    _Kp_w = this->get_parameter("Kp_w").as_double();
+    _Ki_w = this->get_parameter("Ki_w").as_double();
+    _Kd_w = this->get_parameter("Kd_w").as_double();
     _name_of_robots = this->get_parameter("name_of_robots").as_string_array();
     _odom_topic_name = this->get_parameter("odom_topic").as_string();
     
     _number_of_robots = _name_of_robots.size();
 
     _b_ = vector<vector<double>>(_number_of_robots, vector<double>(3, 0.0));
+    _b_rpy = vector<vector<double>>(_number_of_robots, vector<double>(3, 0.0));
     _b_g = vector<vector<double>>(_number_of_robots, vector<double>(2, 0.0));
     _b_obstacles = vector<vector<double>>(_number_of_obstacles, vector<double>(2, 0.0));
 
@@ -82,6 +91,17 @@ void PotentialFunction::dynamicOdometryCallback(const nav_msgs::msg::Odometry::S
     {
         _b_[robot_id][0] = message->pose.pose.position.x;
         _b_[robot_id][1] = message->pose.pose.position.y;
+
+        tf2::Quaternion quaternion(
+            message->pose.pose.orientation.x,
+            message->pose.pose.orientation.y,
+            message->pose.pose.orientation.z,
+            message->pose.pose.orientation.w
+        );
+
+        tf2::Matrix3x3 matrix(quaternion);
+
+        matrix.getRPY(_b_rpy[robot_id][0], _b_rpy[robot_id][1], _b_rpy[robot_id][2]);
     }
 }
 
@@ -347,6 +367,19 @@ void PotentialFunction::calculateDerivativeOfFWithRespectToY(void)
 }
 
 
+
+double PotentialFunction::PIDController(double Kp, double Ki, double Kd, double error_threshold, double error_signal)
+{
+    if(error_signal < abs(error_threshold))
+    {
+        return 0.0;
+    }
+
+    return Kp * error_signal;
+}
+
+
+
 void PotentialFunction::robotController(void)
 {
     findRobotsInRange();
@@ -364,13 +397,17 @@ void PotentialFunction::robotController(void)
     double b_out_x = -1 * _derivative_of_f_with_respect_to_x;
     double b_out_y = -1 * _derivative_of_f_with_respect_to_y;
 
-    RCLCPP_INFO_STREAM(this->get_logger(), "b_out_x: " << b_out_x);
-    RCLCPP_INFO_STREAM(this->get_logger(), "b_out_y: " << b_out_y);
 
     _desired_heading = atan2(b_out_y, b_out_x);
+    double heading_error = _b_rpy[_robot_id][2] - _desired_heading;
 
-    _desired_heading = atan2(sin(_desired_heading), cos(_desired_heading));
+    heading_error = atan2(sin(heading_error), cos(heading_error));
 
+    _cmd_vel_message.angular.z = PIDController(0.1, 0.0, 0.0, 0.1, heading_error);
+
+    _cmd_vel_publisher->publish(_cmd_vel_message);
+
+    RCLCPP_INFO_STREAM(this->get_logger(), "Actual Heading: " << _b_rpy[_robot_id][2]);
     RCLCPP_INFO_STREAM(this->get_logger(), "Desired Heading: " << _desired_heading * 180 / PI );
     RCLCPP_INFO_STREAM(this->get_logger(), "----------------------------");
 }
