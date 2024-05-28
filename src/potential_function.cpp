@@ -14,8 +14,9 @@ Node("potential_function_node")
     _robot_controller_timer = this->create_wall_timer(10ms, bind(&PotentialFunction::robotController, this));
 
     declare_parameter("current_robot_id", 0);
-    declare_parameter("number_of_obstacles", 100);
+    declare_parameter("number_of_obstacles", 0);
     declare_parameter("radius_of_robots", 1.0);
+    declare_parameter("radius_outer", 100.0);
     declare_parameter("limit_distance_for_robots", 1.0);
     declare_parameter("K_gain", 0.5);
     declare_parameter("Kp_w", 0.5);
@@ -27,6 +28,7 @@ Node("potential_function_node")
     _robot_id = this->get_parameter("current_robot_id").as_int();
     _number_of_obstacles = this->get_parameter("number_of_obstacles").as_int();
     _radius_of_robots = this->get_parameter("radius_of_robots").as_double();
+    _radius_outer = this->get_parameter("radius_outer").as_double();
     _limit_distance = this->get_parameter("limit_distance_for_robots").as_double();
     _K_gain = this->get_parameter("K_gain").as_double();
     _Kp_w = this->get_parameter("Kp_w").as_double();
@@ -154,7 +156,7 @@ void PotentialFunction::calculateAlphaAndBeta(void)
         if(_b_[i][2] != 0)
         {
             double distance = pow((_b_[i][0] - _b_g[i][0]), 2) + pow((_b_[i][1] - _b_g[i][1]), 2);
-        
+            RCLCPP_INFO_STREAM(this->get_logger(), "I counter "  << i << " Alpha: " << distance);
             _alpha = _alpha + distance;
         }
     }
@@ -171,6 +173,8 @@ void PotentialFunction::calculateAlphaAndBeta(void)
             {
                 // Caution, pow(_b_[robot_id][2]) process is required?
                 distance = abs(pow((_b_[_robot_id][0] - _b_[i][0]), 2) + pow((_b_[_robot_id][1] - _b_[i][1]), 2) - pow((_b_[_robot_id][2] + _b_[i][2]), 2));
+                RCLCPP_INFO_STREAM(this->get_logger(), "I counter "  << i << " Beta: " << distance);
+                RCLCPP_INFO_STREAM(this->get_logger(), "I counter " << i << " Distance " << pow((_b_[_robot_id][0] - _b_[i][0]), 2) + pow((_b_[_robot_id][1] - _b_[i][1]), 2));
             }
             if(distance > 0)
             {
@@ -208,6 +212,7 @@ void PotentialFunction::calculateAlphaAndBeta(void)
 
         if(distance < _limit_distance_for_obstacles)
         {
+            RCLCPP_INFO_STREAM(this->get_logger(), "Testing Beta for obstacles...");
             _beta = _beta * distance;
         }
     }
@@ -226,6 +231,8 @@ void PotentialFunction::calculateAlphaAndBeta(void)
             _beta = _beta * distance;
         }
     }
+    RCLCPP_INFO_STREAM(this->get_logger(), "Last value for Beta: " << _beta);
+
 }
 
 
@@ -370,7 +377,7 @@ void PotentialFunction::calculateDerivativeOfFWithRespectToY(void)
 
 double PotentialFunction::PIDController(double Kp, double Ki, double Kd, double error_threshold, double error_signal)
 {
-    if(error_signal < abs(error_threshold))
+    if(abs(error_signal) < abs(error_threshold))
     {
         return 0.0;
     }
@@ -399,16 +406,23 @@ void PotentialFunction::robotController(void)
 
 
     _desired_heading = atan2(b_out_y, b_out_x);
-    double heading_error = _b_rpy[_robot_id][2] - _desired_heading;
+    double heading_error =  _desired_heading - _b_rpy[_robot_id][2];
 
     heading_error = atan2(sin(heading_error), cos(heading_error));
 
     _cmd_vel_message.angular.z = PIDController(0.1, 0.0, 0.0, 0.1, heading_error);
+    // _cmd_vel_message.linear.x = 0.1;
 
     _cmd_vel_publisher->publish(_cmd_vel_message);
 
-    RCLCPP_INFO_STREAM(this->get_logger(), "Actual Heading: " << _b_rpy[_robot_id][2]);
+
+    RCLCPP_INFO_STREAM(this->get_logger(), "b_out_x: " << b_out_x);
+    RCLCPP_INFO_STREAM(this->get_logger(), "b_out_y: " << b_out_y);
+
+    RCLCPP_INFO_STREAM(this->get_logger(), "CMD Vel Anguler Z: " << _cmd_vel_message.angular.z);
+    RCLCPP_INFO_STREAM(this->get_logger(), "Actual Heading: " << _b_rpy[_robot_id][2] * 180 / PI);
     RCLCPP_INFO_STREAM(this->get_logger(), "Desired Heading: " << _desired_heading * 180 / PI );
+    RCLCPP_INFO_STREAM(this->get_logger(), "Heading Error: " << heading_error * 180 / PI);
     RCLCPP_INFO_STREAM(this->get_logger(), "----------------------------");
 }
 
