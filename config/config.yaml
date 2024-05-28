@@ -4,4 +4,4 @@
     number_of_obstacles: 0
     radius_of_robots: 0.5
     limit_distance_for_robots: 10.0
-    K_gain: 1.0
+    K_gain: 10.0
