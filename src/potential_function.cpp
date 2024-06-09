@@ -13,7 +13,7 @@ _angular_velocity_controller(0.0, 0.0, 0.0)
 
     _cmd_vel_publisher = this->create_publisher<geometry_msgs::msg::Twist>("/tb_0_0/cmd_vel", 10);
 
-    _robot_controller_timer = this->create_wall_timer(10ms, bind(&PotentialFunction::robotController, this));
+    _robot_controller_timer = this->create_wall_timer(100ms, bind(&PotentialFunction::robotController, this));
 
     declare_parameter("current_robot_id", 0);
     declare_parameter("number_of_obstacles", 0);
@@ -27,6 +27,8 @@ _angular_velocity_controller(0.0, 0.0, 0.0)
     declare_parameter("Kp_w", 0.5);
     declare_parameter("Ki_w", 0.01);
     declare_parameter("Kd_w", 0.01);
+    declare_parameter("threshold_for_linear_velocity", 0.1);
+    declare_parameter("threshold_for_angular_velocity", 0.1);
     declare_parameter("name_of_robots", vector<string>{"tb1", "tb2"});
     declare_parameter("odom_topic", "odom");
 
@@ -42,6 +44,8 @@ _angular_velocity_controller(0.0, 0.0, 0.0)
     _Kp_w = this->get_parameter("Kp_w").as_double();
     _Ki_w = this->get_parameter("Ki_w").as_double();
     _Kd_w = this->get_parameter("Kd_w").as_double();
+    _threshold_for_linear_velocity_error = this->get_parameter("threshold_for_linear_velocity").as_double();
+    _threshold_for_angular_velocity_error = this->get_parameter("threshold_for_angular_velocity").as_double();
     _name_of_robots = this->get_parameter("name_of_robots").as_string_array();
     _odom_topic_name = this->get_parameter("odom_topic").as_string();
     
@@ -136,7 +140,6 @@ vector<string> PotentialFunction::getRobotID(const string &topic_name)
         result.push_back(match[1].str());
         result.push_back(match[2].str());
         result.push_back(match[3].str());
-
     }
 
     return result;
@@ -172,7 +175,6 @@ void PotentialFunction::calculateAlphaAndBeta(void)
         if(_b_[i][2] != 0)
         {
             double distance = pow((_b_[i][0] - _b_g[i][0]), 2) + pow((_b_[i][1] - _b_g[i][1]), 2);
-            RCLCPP_INFO_STREAM(this->get_logger(), "I counter "  << i << " Alpha: " << distance);
             _alpha = _alpha + distance;
         }
     }
@@ -189,8 +191,6 @@ void PotentialFunction::calculateAlphaAndBeta(void)
             {
                 // Caution, pow(_b_[robot_id][2]) process is required?
                 distance = abs(pow((_b_[_robot_id][0] - _b_[i][0]), 2) + pow((_b_[_robot_id][1] - _b_[i][1]), 2) - pow((_b_[_robot_id][2] + _b_[i][2]), 2));
-                RCLCPP_INFO_STREAM(this->get_logger(), "I counter "  << i << " Beta: " << distance);
-                RCLCPP_INFO_STREAM(this->get_logger(), "I counter " << i << " Distance " << pow((_b_[_robot_id][0] - _b_[i][0]), 2) + pow((_b_[_robot_id][1] - _b_[i][1]), 2));
             }
             if(distance > 0)
             {
@@ -228,7 +228,6 @@ void PotentialFunction::calculateAlphaAndBeta(void)
 
         if(distance < _limit_distance_for_obstacles)
         {
-            RCLCPP_INFO_STREAM(this->get_logger(), "Testing Beta for obstacles...");
             _beta = _beta * distance;
         }
     }
@@ -247,8 +246,6 @@ void PotentialFunction::calculateAlphaAndBeta(void)
             _beta = _beta * distance;
         }
     }
-    RCLCPP_INFO_STREAM(this->get_logger(), "Last value for Beta: " << _beta);
-
 }
 
 
@@ -393,6 +390,7 @@ void PotentialFunction::calculateDerivativeOfFWithRespectToY(void)
 
 void PotentialFunction::robotController(void)
 {
+    auto start_time = this->now();
     findRobotsInRange();
 
     calculateAlphaAndBeta();
@@ -414,8 +412,11 @@ void PotentialFunction::robotController(void)
 
     heading_error = atan2(sin(heading_error), cos(heading_error));
 
-    // _cmd_vel_message.angular.z = PIDController(0.1, 0.0, 0.0, 0.1, heading_error);
-    // _cmd_vel_message.linear.x = 0.1;
+    auto end_time = this->now();
+    auto duration = end_time - start_time;
+    double dt = duration.seconds();
+    
+    _cmd_vel_message.angular.z = _angular_velocity_controller.getPIDOutputSignal(heading_error, dt, _threshold_for_angular_velocity_error);
 
     _cmd_vel_publisher->publish(_cmd_vel_message);
 
@@ -426,7 +427,7 @@ void PotentialFunction::robotController(void)
     RCLCPP_INFO_STREAM(this->get_logger(), "CMD Vel Anguler Z: " << _cmd_vel_message.angular.z);
     RCLCPP_INFO_STREAM(this->get_logger(), "Actual Heading: " << _b_rpy[_robot_id][2] * 180 / PI);
     RCLCPP_INFO_STREAM(this->get_logger(), "Desired Heading: " << _desired_heading * 180 / PI );
-    RCLCPP_INFO_STREAM(this->get_logger(), "Heading Error: " << heading_error * 180 / PI);
+    RCLCPP_INFO_STREAM(this->get_logger(), "Heading Error: " << heading_error * 180 / PI );
     RCLCPP_INFO_STREAM(this->get_logger(), "----------------------------");
 }
 

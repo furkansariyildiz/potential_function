@@ -344,6 +344,13 @@ class PotentialFunction: public rclcpp::Node
         double _Kp_w, _Ki_w, _Kd_w;
 
 
+        
+        /**
+         * @brief Threshold values for linear and angular velocity errors.
+         */
+        double _threshold_for_linear_velocity_error, _threshold_for_angular_velocity_error;
+
+
 
         /**
          * @brief Limit for distance between current robot and other robots.
