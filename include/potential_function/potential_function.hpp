@@ -17,6 +17,7 @@
 #include <geometry_msgs/msg/twist.hpp>
 
 #include "subscriber_info.hpp"
+#include <potential_function/pid_controller.hpp>
 // #include <mpfr.hpp>
 
 using namespace std;
@@ -144,18 +145,6 @@ class PotentialFunction: public rclcpp::Node
 
 
         /**
-         * @brief PID controller to get control input
-         * @param
-         * @param
-         * @param
-         * @param
-         * @return control_input
-        */
-        double PIDController(double Kp, double Ki, double Kd, double error_threshold, double error_signal);
-
-
-
-        /**
          * @brief Robot controller function to manipulate cmd_vel topic.
         */
         void robotController(void);
@@ -163,9 +152,23 @@ class PotentialFunction: public rclcpp::Node
 
 
         /**
-         * @brief Dynamic subscribers info 
+         * @brief Dynamic subscribers info. 
         */
         vector<SubscriberInfo> _dynamic_subscribers;
+
+
+
+        /**
+         * @brief
+         */
+        PIDController _linear_velocity_controller;
+
+
+
+        /**
+         * @brief
+         */
+        PIDController _angular_velocity_controller;
 
 
 
@@ -191,21 +194,21 @@ class PotentialFunction: public rclcpp::Node
 
 
         /**
-         * @brief Velocity vector to get desired heading 
+         * @brief Velocity vector to get desired heading.
         */
         double _desired_heading;
 
 
 
         /**
-         * @brief Current robot id
+         * @brief Current robot id.
         */
         int _robot_id;
 
 
 
         /**
-         * @brief Number of robots in environment
+         * @brief Number of robots in environment.
         */
         int _number_of_robots;
 
@@ -329,9 +332,17 @@ class PotentialFunction: public rclcpp::Node
 
 
         /**
-         * @brief Gain parameters for angular velocity 
+         * @brief Gain parameters for linear velocity.
+         */
+        double _Kp_v, _Ki_v, _Kd_v;
+
+
+
+        /**
+         * @brief Gain parameters for angular velocity.
         */
         double _Kp_w, _Ki_w, _Kd_w;
+
 
 
         /**
@@ -356,35 +367,35 @@ class PotentialFunction: public rclcpp::Node
 
 
         /**
-         * @brief Radius of each robots
+         * @brief Radius of each robots.
         */
         double _radius_of_robots;
 
 
 
         /**
-         * @brief Robot positions
+         * @brief Robot positions.
         */
         vector<vector<double>> _b_;
 
 
 
         /**
-         * @brief Robot RPY (roll, pitch, yaw) 
+         * @brief Robot RPY (roll, pitch, yaw).
         */
         vector<vector<double>> _b_rpy;
 
 
 
         /**
-         * @brief Target positions
+         * @brief Target positions.
         */
         vector<vector<double>> _b_g;
 
 
 
         /**
-         * @brief Obstacles positions
+         * @brief Obstacles positions.
         */
         vector<vector<double>> _b_obstacles;
 
@@ -394,6 +405,7 @@ class PotentialFunction: public rclcpp::Node
          * @brief Name of the robots dynamic subscriber.
         */
         vector<string> _name_of_robots;
+
 
 
         /**

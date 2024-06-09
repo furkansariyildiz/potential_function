@@ -5,7 +5,9 @@ using namespace std;
 
 
 PotentialFunction::PotentialFunction():
-Node("potential_function_node")
+Node("potential_function_node"),
+_linear_velocity_controller(0.0, 0.0, 0.0),
+_angular_velocity_controller(0.0, 0.0, 0.0)
 {   
     _target_pose_list_subscriber = this->create_subscription<potential_function::msg::TargetPoseList>("/target_pose_list", 1000, bind(&PotentialFunction::targetPoseListCallback, this, placeholders::_1));
 
@@ -19,6 +21,9 @@ Node("potential_function_node")
     declare_parameter("radius_outer", 15.0);
     declare_parameter("limit_distance_for_robots", 1.0);
     declare_parameter("K_gain", 0.5);
+    declare_parameter("Kp_v", 0.5);
+    declare_parameter("Ki_v", 0.01);
+    declare_parameter("Kd_v", 0.01);
     declare_parameter("Kp_w", 0.5);
     declare_parameter("Ki_w", 0.01);
     declare_parameter("Kd_w", 0.01);
@@ -31,6 +36,9 @@ Node("potential_function_node")
     _radius_outer = this->get_parameter("radius_outer").as_double();
     _limit_distance = this->get_parameter("limit_distance_for_robots").as_double();
     _K_gain = this->get_parameter("K_gain").as_double();
+    _Kp_v = this->get_parameter("Kp_v").as_double();
+    _Ki_v = this->get_parameter("Ki_v").as_double();
+    _Kd_v = this->get_parameter("Kd_v").as_double();
     _Kp_w = this->get_parameter("Kp_w").as_double();
     _Ki_w = this->get_parameter("Ki_w").as_double();
     _Kd_w = this->get_parameter("Kd_w").as_double();
@@ -38,6 +46,14 @@ Node("potential_function_node")
     _odom_topic_name = this->get_parameter("odom_topic").as_string();
     
     _number_of_robots = _name_of_robots.size();
+
+    _linear_velocity_controller.setKp(_Kp_v);
+    _linear_velocity_controller.setKi(_Ki_v);
+    _linear_velocity_controller.setKd(_Kd_v);
+
+    _angular_velocity_controller.setKp(_Kp_w);
+    _angular_velocity_controller.setKi(_Ki_w);
+    _angular_velocity_controller.setKd(_Kd_w);
 
     _b_ = vector<vector<double>>(_number_of_robots, vector<double>(3, 0.0));
     _b_rpy = vector<vector<double>>(_number_of_robots, vector<double>(3, 0.0));
@@ -375,18 +391,6 @@ void PotentialFunction::calculateDerivativeOfFWithRespectToY(void)
 
 
 
-double PotentialFunction::PIDController(double Kp, double Ki, double Kd, double error_threshold, double error_signal)
-{
-    if(abs(error_signal) < abs(error_threshold))
-    {
-        return 0.0;
-    }
-
-    return Kp * error_signal;
-}
-
-
-
 void PotentialFunction::robotController(void)
 {
     findRobotsInRange();
@@ -410,7 +414,7 @@ void PotentialFunction::robotController(void)
 
     heading_error = atan2(sin(heading_error), cos(heading_error));
 
-    _cmd_vel_message.angular.z = PIDController(0.1, 0.0, 0.0, 0.1, heading_error);
+    // _cmd_vel_message.angular.z = PIDController(0.1, 0.0, 0.0, 0.1, heading_error);
     // _cmd_vel_message.linear.x = 0.1;
 
     _cmd_vel_publisher->publish(_cmd_vel_message);
