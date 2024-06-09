@@ -66,7 +66,7 @@ double PIDController::getPIDOutputSignal(double error, double dt, double thresho
 
     previous_error_ = error;
 
-    if(abs(P_ + I_ + D_ ) <= threshold)
+    if(abs(error) <= threshold)
     {
         return 0.0;
     }
