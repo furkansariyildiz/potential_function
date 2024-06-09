@@ -55,3 +55,21 @@ void PIDController::setKd(double Kd)
 {
     Kd_ = Kd;
 }
+
+
+
+double PIDController::getPIDOutputSignal(double error, double dt, double threshold)
+{
+    P_ = Kp_ * error;
+    I_ = I_ + Ki_ * error * dt;
+    D_ = Kd_ * (error - previous_error_) / dt;
+
+    previous_error_ = error;
+
+    if(abs(P_ + I_ + D_ ) <= threshold)
+    {
+        return 0.0;
+    }
+
+    return P_ + I_ + D_;
+}
