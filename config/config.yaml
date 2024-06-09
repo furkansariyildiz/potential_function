@@ -9,6 +9,8 @@
     Kp_v: 0.1
     Ki_v: 0.05
     Kd_v: 0.05
-    Kp_w: 0.1
-    Ki_w: 0.05
-    Kd_w: 0.05
+    Kp_w: 0.4
+    Ki_w: 0.0
+    Kd_w: 0.0
+    threshold_for_linear_velocity: 0.1
+    threshold_for_angular_velocity: 0.01
