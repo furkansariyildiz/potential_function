@@ -18,6 +18,8 @@ find_package(rosidl_default_generators REQUIRED)
 
 include_directories(include ${BOOST_INCLUDE_DIRS})
 
+add_library(pid_controller src/pid_controller.cpp)
+
 rosidl_generate_interfaces(${PROJECT_NAME}_msgs
   "msg/RobotPosition.msg"
   "msg/RobotsPositionList.msg"
@@ -27,13 +29,15 @@ rosidl_generate_interfaces(${PROJECT_NAME}_msgs
 )
 
 add_executable(potential_function src/potential_function.cpp)
-target_link_libraries(potential_function ${catkin_LIBRARIES})
+target_link_libraries(potential_function ${catkin_LIBRARIES} pid_controller)
 ament_target_dependencies(potential_function rclcpp std_msgs nav_msgs tf2)
+ament_export_targets(potential_function HAS_LIBRARY_TARGET)
 
 ament_python_install_package(scripts)
 
 install(TARGETS
         potential_function
+        pid_controller
         DESTINATION lib/${PROJECT_NAME}
 )
 
@@ -48,6 +52,19 @@ install(PROGRAMS
         DESTINATION lib/${PROJECT_NAME}
 )
 
+install(DIRECTORY include/potential_function
+        DESTINATION include
+)
+
+install(
+        TARGETS potential_function
+        EXPORT potential_function
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib
+        RUNTIME DESTINATION bin
+        INCLUDES DESTINATION include
+)
+
 # This is for Galactic or Foxy 
 rosidl_target_interfaces(potential_function ${PROJECT_NAME}_msgs "rosidl_typesupport_cpp")
 
@@ -58,4 +75,5 @@ rosidl_target_interfaces(potential_function ${PROJECT_NAME}_msgs "rosidl_typesup
 # target_link_libraries(potential_function "${cpp_typesupport_target}")
 
 ament_export_dependencies(rosidl_default_runtime)
+ament_export_include_directories(include)
 ament_package()
