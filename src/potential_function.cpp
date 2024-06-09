@@ -16,7 +16,7 @@ Node("potential_function_node")
     declare_parameter("current_robot_id", 0);
     declare_parameter("number_of_obstacles", 0);
     declare_parameter("radius_of_robots", 1.0);
-    declare_parameter("radius_outer", 100.0);
+    declare_parameter("radius_outer", 15.0);
     declare_parameter("limit_distance_for_robots", 1.0);
     declare_parameter("K_gain", 0.5);
     declare_parameter("Kp_w", 0.5);

@@ -3,5 +3,6 @@
     current_robot_id: 0
     number_of_obstacles: 0
     radius_of_robots: 0.5
+    radius_outer: 1000.0
     limit_distance_for_robots: 10.0
     K_gain: 10.0
