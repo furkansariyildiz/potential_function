@@ -7,10 +7,12 @@
     limit_distance_for_robots: 10.0
     K_gain: 10.0
     Kp_v: 0.1
-    Ki_v: 0.05
-    Kd_v: 0.05
+    Ki_v: 0.0
+    Kd_v: 0.0
     Kp_w: 0.4
     Ki_w: 0.0
     Kd_w: 0.0
     threshold_for_linear_velocity: 0.1
     threshold_for_angular_velocity: 0.01
+    anti_windup_for_linear_velocity: 0.2
+    anti_windup_for_angular_velocity: 0.2
