@@ -16,7 +16,7 @@ class TargetPoseListPublisher(Node):
         self._target_pose_list_publisher = self.create_publisher(TargetPoseList, 'target_pose_list', 10)
 
         # Declare parameters dynamically based on prefix 'tb_'
-        self.declare_parameters(namespace='',parameters=[('tb_0_0.x', 0.0), ('tb_0_0.y', 0.0), ('tb_1_0.x', 0.0), ('tb_1_0.y', 0.0), ('tb_2_0.x', 0.0), ('tb_2_0.y', 0.0), ('tb_3_0.x', 0.0), ('tb_3_0.y', 0.0), ('tb_4_0.x', 0.0), ('tb_4_0.y', 0.0)])
+        self.declare_parameters(namespace='',parameters=[('tb_0_0.x', 0.0), ('tb_0_0.y', 0.0), ('tb_1_0.x', 0.0), ('tb_1_0.y', 0.0)])
 
         # Timer to publish poses
         self._dt = 0.1  # seconds
