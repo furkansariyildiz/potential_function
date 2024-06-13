@@ -9,13 +9,8 @@ Node("potential_function_node"),
 _linear_velocity_controller(0.0, 0.0, 0.0),
 _angular_velocity_controller(0.0, 0.0, 0.0)
 {   
-    _target_pose_list_subscriber = this->create_subscription<potential_function::msg::TargetPoseList>("/target_pose_list", 1000, bind(&PotentialFunction::targetPoseListCallback, this, placeholders::_1));
-
-    _cmd_vel_publisher = this->create_publisher<geometry_msgs::msg::Twist>("/tb_0_0/cmd_vel", 10);
-
-    _robot_controller_timer = this->create_wall_timer(100ms, bind(&PotentialFunction::robotController, this));
-
     declare_parameter("current_robot_id", 0);
+    declare_parameter("current_robot_name", "tb_0");
     declare_parameter("number_of_obstacles", 0);
     declare_parameter("radius_of_robots", 1.0);
     declare_parameter("radius_outer", 15.0);
@@ -35,6 +30,7 @@ _angular_velocity_controller(0.0, 0.0, 0.0)
     declare_parameter("odom_topic", "odom");
 
     _robot_id = this->get_parameter("current_robot_id").as_int();
+    _current_robot_name = this->get_parameter("current_robot_name").as_string();
     _number_of_obstacles = this->get_parameter("number_of_obstacles").as_int();
     _radius_of_robots = this->get_parameter("radius_of_robots").as_double();
     _radius_outer = this->get_parameter("radius_outer").as_double();
@@ -53,6 +49,12 @@ _angular_velocity_controller(0.0, 0.0, 0.0)
     _name_of_robots = this->get_parameter("name_of_robots").as_string_array();
     _odom_topic_name = this->get_parameter("odom_topic").as_string();
     
+    _target_pose_list_subscriber = this->create_subscription<potential_function::msg::TargetPoseList>("/target_pose_list", 1000, bind(&PotentialFunction::targetPoseListCallback, this, placeholders::_1));
+
+    _cmd_vel_publisher = this->create_publisher<geometry_msgs::msg::Twist>("/" + _current_robot_name +  "/cmd_vel", 10);
+
+    _robot_controller_timer = this->create_wall_timer(100ms, bind(&PotentialFunction::robotController, this));
+
     _number_of_robots = _name_of_robots.size();
 
     _linear_velocity_controller.setKp(_Kp_v);

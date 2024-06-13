@@ -208,6 +208,13 @@ class PotentialFunction: public rclcpp::Node
 
 
         /**
+         * @brief
+         */
+        string _current_robot_name;
+
+
+
+        /**
          * @brief Number of robots in environment.
         */
         int _number_of_robots;
