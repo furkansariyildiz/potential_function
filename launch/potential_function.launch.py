@@ -19,6 +19,17 @@ def generate_launch_description():
         ),
         Node(
             package='potential_function',
+            executable='potential_function',
+            name='potential_function_node_1',
+            output='screen',
+            parameters=[os.path.join(
+                get_package_share_directory('potential_function'),
+                'config', 'config.yaml'), 
+                os.path.join(get_package_share_directory('potential_function'),
+                'config', 'topics.yaml')]
+        ),
+        Node(
+            package='potential_function',
             executable='target_pose_list_publisher.py',
             name='target_pose_list_publisher_node',
             output='screen',
