@@ -353,6 +353,13 @@ class PotentialFunction: public rclcpp::Node
 
 
         /**
+         * @brief Anti-windup values to control linear velocity and angular velocity signals.
+         */
+        double _anti_windup_for_linear_velocity, _anti_windup_for_angular_velocity;
+
+
+
+        /**
          * @brief Limit for distance between current robot and other robots.
         */
         double _limit_distance;

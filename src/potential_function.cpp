@@ -29,6 +29,8 @@ _angular_velocity_controller(0.0, 0.0, 0.0)
     declare_parameter("Kd_w", 0.01);
     declare_parameter("threshold_for_linear_velocity", 0.1);
     declare_parameter("threshold_for_angular_velocity", 0.1);
+    declare_parameter("anti_windup_for_linear_velocity", 0.1);
+    declare_parameter("anti_windup_for_angular_velocity", 0.1);
     declare_parameter("name_of_robots", vector<string>{"tb1", "tb2"});
     declare_parameter("odom_topic", "odom");
 
@@ -46,6 +48,8 @@ _angular_velocity_controller(0.0, 0.0, 0.0)
     _Kd_w = this->get_parameter("Kd_w").as_double();
     _threshold_for_linear_velocity_error = this->get_parameter("threshold_for_linear_velocity").as_double();
     _threshold_for_angular_velocity_error = this->get_parameter("threshold_for_angular_velocity").as_double();
+    _anti_windup_for_linear_velocity = this->get_parameter("anti_windup_for_linear_velocity").as_double();
+    _anti_windup_for_angular_velocity = this->get_parameter("anti_windup_for_angular_velocity").as_double();
     _name_of_robots = this->get_parameter("name_of_robots").as_string_array();
     _odom_topic_name = this->get_parameter("odom_topic").as_string();
     
@@ -58,6 +62,10 @@ _angular_velocity_controller(0.0, 0.0, 0.0)
     _angular_velocity_controller.setKp(_Kp_w);
     _angular_velocity_controller.setKi(_Ki_w);
     _angular_velocity_controller.setKd(_Kd_w);
+
+    _linear_velocity_controller.setAntiWindup(_anti_windup_for_linear_velocity);
+
+    _angular_velocity_controller.setAntiWindup(_anti_windup_for_angular_velocity);
 
     _b_ = vector<vector<double>>(_number_of_robots, vector<double>(3, 0.0));
     _b_rpy = vector<vector<double>>(_number_of_robots, vector<double>(3, 0.0));
@@ -412,18 +420,23 @@ void PotentialFunction::robotController(void)
 
     heading_error = atan2(sin(heading_error), cos(heading_error));
 
+    double distance_error = sqrt(pow(_b_g[_robot_id][0] - _b_[_robot_id][0], 2) + pow(_b_g[_robot_id][1] - _b_[_robot_id][1], 2));
+
     auto end_time = this->now();
     auto duration = end_time - start_time;
     double dt = duration.seconds();
     
     _cmd_vel_message.angular.z = _angular_velocity_controller.getPIDOutputSignal(heading_error, dt, _threshold_for_angular_velocity_error);
+    _cmd_vel_message.linear.x = _linear_velocity_controller.getPIDOutputSignal(distance_error, dt, _threshold_for_linear_velocity_error);
 
     _cmd_vel_publisher->publish(_cmd_vel_message);
-
 
     RCLCPP_INFO_STREAM(this->get_logger(), "b_out_x: " << b_out_x);
     RCLCPP_INFO_STREAM(this->get_logger(), "b_out_y: " << b_out_y);
 
+
+    RCLCPP_INFO_STREAM(this->get_logger(), "Distance: " << distance_error);
+    RCLCPP_INFO_STREAM(this->get_logger(), "Liner Velocity: " << _cmd_vel_message.linear.x);
     RCLCPP_INFO_STREAM(this->get_logger(), "CMD Vel Anguler Z: " << _cmd_vel_message.angular.z);
     RCLCPP_INFO_STREAM(this->get_logger(), "Actual Heading: " << _b_rpy[_robot_id][2] * 180 / PI);
     RCLCPP_INFO_STREAM(this->get_logger(), "Desired Heading: " << _desired_heading * 180 / PI );
