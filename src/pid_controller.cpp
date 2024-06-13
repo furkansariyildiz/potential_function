@@ -58,11 +58,20 @@ void PIDController::setKd(double Kd)
 
 
 
+void PIDController::setAntiWindup(double anti_windup)
+{
+    anti_windup_ = anti_windup;
+}
+
+
+
 double PIDController::getPIDOutputSignal(double error, double dt, double threshold)
 {
     P_ = Kp_ * error;
     I_ = I_ + Ki_ * error * dt;
     D_ = Kd_ * (error - previous_error_) / dt;
+
+    control_input_ = P_ + I_ + D_;
 
     previous_error_ = error;
 
@@ -71,5 +80,14 @@ double PIDController::getPIDOutputSignal(double error, double dt, double thresho
         return 0.0;
     }
 
-    return P_ + I_ + D_;
+    if(control_input_ > anti_windup_)
+    {
+        return anti_windup_;
+    }
+    else if(control_input_ < -1 * anti_windup_)
+    {
+        return -1 * anti_windup_;
+    }
+
+    return control_input_;
 }

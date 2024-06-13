@@ -37,9 +37,22 @@ class PIDController
 
 
         /**
+         * @brief
+         */
+        double control_input_;
+
+
+
+        /**
          * @brief 
          */
         double previous_error_;
+
+
+        /**
+         * @brief
+         */
+        double anti_windup_;
 
     public:
         /**
@@ -95,6 +108,13 @@ class PIDController
          * @brief
          */
         void setKd(double Kd);
+
+
+
+        /**
+         * @brief
+         */
+        void setAntiWindup(double anti_windup);
 
 
 
