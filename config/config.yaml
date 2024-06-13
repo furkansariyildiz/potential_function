@@ -1,9 +1,30 @@
 /potential_function_node:
   ros__parameters:
     current_robot_id: 0
+    current_robot_name: "tb_0_0"
     number_of_obstacles: 0
     radius_of_robots: 0.5
-    radius_outer: 1000.0
+    radius_outer: 10.0
+    limit_distance_for_robots: 10.0
+    K_gain: 10.0
+    Kp_v: 0.1
+    Ki_v: 0.0
+    Kd_v: 0.0
+    Kp_w: 0.4
+    Ki_w: 0.0
+    Kd_w: 0.0
+    threshold_for_linear_velocity: 0.1
+    threshold_for_angular_velocity: 0.01
+    anti_windup_for_linear_velocity: 0.2
+    anti_windup_for_angular_velocity: 0.2
+
+/potential_function_node_1:
+  ros__parameters:
+    current_robot_id: 1
+    current_robot_name: "tb_1_0"
+    number_of_obstacles: 0
+    radius_of_robots: 0.5
+    radius_outer: 10.0
     limit_distance_for_robots: 10.0
     K_gain: 10.0
     Kp_v: 0.1

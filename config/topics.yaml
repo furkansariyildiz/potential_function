@@ -1,4 +1,9 @@
 /potential_function_node:
   ros__parameters:
-    name_of_robots: ["/tb_0_0", "/tb_1_0"] # ["/tb_0_0", "/tb_1_0", "/tb_2_0", "/tb_3_0", "/tb_4_0"]
+    name_of_robots: ["/tb_0_0", "/tb_1_0", "/tb_2_0"] # ["/tb_0_0", "/tb_1_0", "/tb_2_0", "/tb_3_0", "/tb_4_0"]
+    odom_topic: "odom"
+
+/potential_function_node_1:
+  ros__parameters:
+    name_of_robots: ["/tb_0_0", "/tb_1_0", "/tb_2_0"] # ["/tb_0_0", "/tb_1_0", "/tb_2_0", "/tb_3_0", "/tb_4_0"]
     odom_topic: "odom"
