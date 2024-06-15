@@ -1,4 +1,4 @@
-/potential_function_node:
+/potential_function_node_0:
   ros__parameters:
     current_robot_id: 0
     current_robot_name: "tb_0_0"

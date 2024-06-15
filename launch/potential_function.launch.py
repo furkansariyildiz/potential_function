@@ -9,7 +9,7 @@ def generate_launch_description():
         Node(
             package='potential_function',
             executable='potential_function',
-            name='potential_function_node',
+            name='potential_function_node_0',
             output='screen',
             parameters=[os.path.join(
                 get_package_share_directory('potential_function'),
