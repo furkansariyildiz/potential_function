@@ -5,8 +5,8 @@
     number_of_obstacles: 0
     radius_of_robots: 1.0
     radius_outer: 20.0
-    limit_distance_for_robots: 10.0
-    K_gain: 15.0
+    limit_distance_for_robots: 5.0
+    K_gain: 50.0
     Kp_v: 0.1
     Ki_v: 0.0
     Kd_v: 0.0
@@ -25,8 +25,8 @@
     number_of_obstacles: 0
     radius_of_robots: 1.0
     radius_outer: 20.0
-    limit_distance_for_robots: 10.0
-    K_gain: 15.0
+    limit_distance_for_robots: 5.0
+    K_gain: 50.0
     Kp_v: 0.1
     Ki_v: 0.0
     Kd_v: 0.0
@@ -45,8 +45,48 @@
     number_of_obstacles: 0
     radius_of_robots: 1.0
     radius_outer: 20.0
-    limit_distance_for_robots: 10.0
-    K_gain: 15.0
+    limit_distance_for_robots: 5.0
+    K_gain: 50.0
+    Kp_v: 0.1
+    Ki_v: 0.0
+    Kd_v: 0.0
+    Kp_w: 0.8
+    Ki_w: 0.05
+    Kd_w: 0.0
+    threshold_for_linear_velocity: 0.1
+    threshold_for_angular_velocity: 0.01
+    anti_windup_for_linear_velocity: 0.2
+    anti_windup_for_angular_velocity: 0.7
+
+/potential_function_node_3:
+  ros__parameters:
+    current_robot_id: 3
+    current_robot_name: "tb_3_0"
+    number_of_obstacles: 0
+    radius_of_robots: 1.0
+    radius_outer: 20.0
+    limit_distance_for_robots: 5.0
+    K_gain: 50.0
+    Kp_v: 0.1
+    Ki_v: 0.0
+    Kd_v: 0.0
+    Kp_w: 0.8
+    Ki_w: 0.05
+    Kd_w: 0.0
+    threshold_for_linear_velocity: 0.1
+    threshold_for_angular_velocity: 0.01
+    anti_windup_for_linear_velocity: 0.2
+    anti_windup_for_angular_velocity: 0.7
+
+/potential_function_node_4:
+  ros__parameters:
+    current_robot_id: 4
+    current_robot_name: "tb_4_0"
+    number_of_obstacles: 0
+    radius_of_robots: 1.0
+    radius_outer: 20.0
+    limit_distance_for_robots: 5.0
+    K_gain: 50.0
     Kp_v: 0.1
     Ki_v: 0.0
     Kd_v: 0.0
