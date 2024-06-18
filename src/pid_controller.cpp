@@ -5,7 +5,9 @@
 PIDController::PIDController(double Kp, double Ki, double Kd): 
 Kp_(Kp), Ki_(Ki), Kd_(Kd)
 {
-
+    P_ = 0.0;
+    I_ = 0.0;
+    D_ = 0.0;
 }
 
 
@@ -72,6 +74,14 @@ double PIDController::getPIDOutputSignal(double error, double dt, double thresho
     D_ = Kd_ * (error - previous_error_) / dt;
 
     control_input_ = P_ + I_ + D_;
+
+    std::cout << "Kp: " << Kp_ << " Ki: " << Ki_ << " Kd: " << Kd_ << std::endl;
+
+    std::cout << "P : " << P_ << " I : " << I_ << " D: " << D_ << std::endl;
+
+    std::cout << "Error: " << error << std::endl;
+
+    std::cout << "Control input: " << control_input_ << std::endl;
 
     previous_error_ = error;
 
