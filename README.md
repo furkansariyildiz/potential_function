@@ -26,12 +26,10 @@ https://medium.com/@arshad.mehmood/efficient-deployment-and-operation-of-multipl
 
 
 <p align="center">
-  <img src="documents/first_positions.png" alt="First position" style="width: 50%; height: 50%"/>
-  <p align="center">First position for all robots.</p>
+  <img src="documents/initial_positions.jpg"/>
 </p>
 
 
 <p align="center">
-  <img src="documents/last_positions.png" alt="Last position" style="width: 50%; height: 50%"/>
-  <p align="center">Last position for all robots.</p>
+  <img src="documents/final_positions.jpg" alt="Last position"/>
 </p>
