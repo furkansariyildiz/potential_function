@@ -27,11 +27,11 @@ https://medium.com/@arshad.mehmood/efficient-deployment-and-operation-of-multipl
 
 ### First Positions
 <p align="center">
-  <img src="documents/first_positions.png" style="width: 50%; height: 50%"/>
+  <img src="documents/first_positions.png" alt="First position" style="width: 50%; height: 50%"/>
 </p>
 
 
 ### Last Positions
 <p align="center">
-  <img src="documents/last_positions.png" style="width: 50%; height: 50%"/>
+  <img src="documents/last_positions.png" alt="Last position" style="width: 50%; height: 50%"/>
 </p>
