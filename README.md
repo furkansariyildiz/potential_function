@@ -23,3 +23,15 @@ ros2 launch potential_function potential_function.launch.py
 
 ### Multirobot guideline
 https://medium.com/@arshad.mehmood/efficient-deployment-and-operation-of-multiple-turtlebot3-robots-in-gazebos-f72f6a364620
+
+
+### First Positions
+<p align="center">
+  <img src="documents/first_positions.png" style="width: 50%; height: 50%"/>
+</p>
+
+
+### Last Positions
+<p align="center">
+  <img src="documents/last_positions.png" style="width: 50%; height: 50%"/>
+</p>
