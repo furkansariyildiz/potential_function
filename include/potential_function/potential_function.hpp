@@ -18,7 +18,7 @@
 
 #include "subscriber_info.hpp"
 #include <potential_function/pid_controller.hpp>
-#include <mpfr.h>
+#include <mpfr.hpp>
 
 using namespace std;
 
@@ -60,6 +60,13 @@ class PotentialFunction: public rclcpp::Node
          * @brief Timer for main loop (robot controller)
         */
         rclcpp::TimerBase::SharedPtr _robot_controller_timer;
+
+        
+
+        /**
+         * @brief MPFR Rounding type
+         */
+        mpfr_rnd_t _mpfr_rounding; 
 
 
 

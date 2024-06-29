@@ -93,6 +93,28 @@ _angular_velocity_controller(0.0, 0.0, 0.0)
 
         _dynamic_subscribers.push_back(subscriber_info);
     }
+
+    _mpfr_rounding = mpfr_get_default_rounding_mode();
+
+    switch (_mpfr_rounding) {
+        case MPFR_RNDN:
+            std::cout << "Default rounding mode: MPFR_RNDN (Round to nearest, ties to even)" << std::endl;
+            break;
+        case MPFR_RNDZ:
+            std::cout << "Default rounding mode: MPFR_RNDZ (Round toward zero)" << std::endl;
+            break;
+        case MPFR_RNDU:
+            std::cout << "Default rounding mode: MPFR_RNDU (Round toward +∞)" << std::endl;
+            break;
+        case MPFR_RNDD:
+            std::cout << "Default rounding mode: MPFR_RNDD (Round toward −∞)" << std::endl;
+            break;
+        case MPFR_RNDA:
+            std::cout << "Default rounding mode: MPFR_RNDA (Round away from zero)" << std::endl;
+            break;
+        default:
+            std::cout << "Unknown rounding mode" << std::endl;
+    }
 }
 
 
