@@ -18,7 +18,7 @@
 
 #include "subscriber_info.hpp"
 #include <potential_function/pid_controller.hpp>
-// #include <mpfr.hpp>
+#include <mpfr.h>
 
 using namespace std;
 

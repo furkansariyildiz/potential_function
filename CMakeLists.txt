@@ -16,6 +16,9 @@ find_package(tf2 REQUIRED)
 find_package(nav_msgs REQUIRED)
 find_package(rosidl_default_generators REQUIRED)
 
+include_directories(/usr/include/boost/multiprecision)
+link_directories(/usr/lib /usr/local/lib)
+
 include_directories(include ${BOOST_INCLUDE_DIRS})
 
 add_library(pid_controller src/pid_controller.cpp)
