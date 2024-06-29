@@ -33,3 +33,5 @@ https://medium.com/@arshad.mehmood/efficient-deployment-and-operation-of-multipl
 <p align="center">
   <img src="documents/final_positions.jpg" alt="Last position"/>
 </p>
+
+![Alt Text](./documents/potential_function.gif)
