@@ -57,23 +57,27 @@ _angular_velocity_controller(0.0, 0.0, 0.0)
 
     _number_of_robots = _name_of_robots.size();
 
+    // Setting Kp, Ki, Kd gains for linear velocity controller.
     _linear_velocity_controller.setKp(_Kp_v);
     _linear_velocity_controller.setKi(_Ki_v);
     _linear_velocity_controller.setKd(_Kd_v);
 
+    // Setting Kp, Ki, Kd gains for angular velocity controller.
     _angular_velocity_controller.setKp(_Kp_w);
     _angular_velocity_controller.setKi(_Ki_w);
     _angular_velocity_controller.setKd(_Kd_w);
 
+    // Setting linear and angular velocity controllers (PID).
     _linear_velocity_controller.setAntiWindup(_anti_windup_for_linear_velocity);
-
     _angular_velocity_controller.setAntiWindup(_anti_windup_for_angular_velocity);
 
+    // Initial declaring position and orientation of robots, goals for each robotos and obstacles positions
     _b_ = vector<vector<double>>(_number_of_robots, vector<double>(3, 0.0));
     _b_rpy = vector<vector<double>>(_number_of_robots, vector<double>(3, 0.0));
     _b_g = vector<vector<double>>(_number_of_robots, vector<double>(2, 0.0));
     _b_obstacles = vector<vector<double>>(_number_of_obstacles, vector<double>(2, 0.0));
 
+    // Generating subscriber dynamic format with robot and topic name
     for(int i=0; i<_name_of_robots.size(); i++)
     {
         SubscriberInfo subscriber_info;
@@ -94,27 +98,8 @@ _angular_velocity_controller(0.0, 0.0, 0.0)
         _dynamic_subscribers.push_back(subscriber_info);
     }
 
-    _mpfr_rounding = mpfr_get_default_rounding_mode();
-
-    switch (_mpfr_rounding) {
-        case MPFR_RNDN:
-            std::cout << "Default rounding mode: MPFR_RNDN (Round to nearest, ties to even)" << std::endl;
-            break;
-        case MPFR_RNDZ:
-            std::cout << "Default rounding mode: MPFR_RNDZ (Round toward zero)" << std::endl;
-            break;
-        case MPFR_RNDU:
-            std::cout << "Default rounding mode: MPFR_RNDU (Round toward +∞)" << std::endl;
-            break;
-        case MPFR_RNDD:
-            std::cout << "Default rounding mode: MPFR_RNDD (Round toward −∞)" << std::endl;
-            break;
-        case MPFR_RNDA:
-            std::cout << "Default rounding mode: MPFR_RNDA (Round away from zero)" << std::endl;
-            break;
-        default:
-            std::cout << "Unknown rounding mode" << std::endl;
-    }
+    // Getting default rounding mode
+    _mpfr_rounding_mode = mpfr_get_default_rounding_mode();
 }
 
 
@@ -200,18 +185,19 @@ void PotentialFunction::findRobotsInRange(void)
 
 void PotentialFunction::calculateAlphaAndBeta(void)
 {
-    _alpha = 0.0;
+    mpfr_set_d(_alpha, 0.0, _mpfr_rounding_mode);
     
     for(int i=0; i<_number_of_robots; i++)
     {
         if(_b_[i][2] != 0)
         {
             double distance = pow((_b_[i][0] - _b_g[i][0]), 2) + pow((_b_[i][1] - _b_g[i][1]), 2);
-            _alpha = _alpha + distance;
+                        
+            mpfr_add_d(_alpha, _alpha, distance, _mpfr_rounding_mode);
         }
     }
 
-    _beta = 1.0;
+    mpfr_set_d(_beta, 1.0, _mpfr_rounding_mode);
 
     for(int i=0; i<_number_of_robots; i++)
     {
@@ -226,7 +212,7 @@ void PotentialFunction::calculateAlphaAndBeta(void)
             }
             if(distance > 0)
             {
-                _beta = _beta * distance;
+                mpfr_mul_d(_beta, _beta, distance, _mpfr_rounding_mode);
             }
         }
     }
@@ -247,7 +233,7 @@ void PotentialFunction::calculateAlphaAndBeta(void)
                 }
                 if(distance > 0)
                 {
-                    _beta = _beta * distance;
+                    mpfr_mul_d(_beta, _beta, distance, _mpfr_rounding_mode);
                 }
             }
         }
@@ -260,7 +246,7 @@ void PotentialFunction::calculateAlphaAndBeta(void)
 
         if(distance < _limit_distance_for_obstacles)
         {
-            _beta = _beta * distance;
+            mpfr_mul_d(_beta, _beta, distance, _mpfr_rounding_mode);
         }
     }
 
@@ -275,7 +261,7 @@ void PotentialFunction::calculateAlphaAndBeta(void)
         }
         if(distance > 0)
         {
-            _beta = _beta * distance;
+            mpfr_mul_d(_beta, _beta, distance, _mpfr_rounding_mode);
         }
     }
 }

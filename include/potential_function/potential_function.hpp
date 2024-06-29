@@ -66,7 +66,7 @@ class PotentialFunction: public rclcpp::Node
         /**
          * @brief MPFR Rounding type
          */
-        mpfr_rnd_t _mpfr_rounding; 
+        mpfr_rnd_t _mpfr_rounding_mode; 
 
 
 
@@ -237,14 +237,14 @@ class PotentialFunction: public rclcpp::Node
         /**
          * @brief Alpha (A)
         */
-        double _alpha;
+        mpfr_t _alpha;
 
 
 
         /**
          * @brief Beta (B)
         */
-        double _beta;
+        mpfr_t _beta;
 
 
 
