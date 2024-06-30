@@ -326,7 +326,7 @@ void PotentialFunction::calculateDerivativeOfBetaWithRespectToX(void)
 
 void PotentialFunction::calculateDerivativeOfBetaWithRespectToY(void)
 {
-    _derivative_of_beta_with_respect_to_y = 0;
+    mpfr_set_d(_derivative_of_beta_with_respect_to_y, 0.0, _mpfr_rounding_mode);
 
     // For current robot and other robots
     for(int i=0; i<_number_of_robots; i++)
@@ -338,7 +338,7 @@ void PotentialFunction::calculateDerivativeOfBetaWithRespectToY(void)
             if(_b_[i][2] != 0)
             {
                 derivative_value_for_each_robot = 2 * (_b_[_robot_id][1] - _b_[i][1]) / (pow(_b_[_robot_id][0] - _b_[i][0], 2) + pow(_b_[_robot_id][1] - _b_[i][1], 2) - pow(_b_[_robot_id][2] + _b_[i][2], 2));
-                _derivative_of_beta_with_respect_to_y = _derivative_of_beta_with_respect_to_y + derivative_value_for_each_robot;
+                mpfr_add_d(_derivative_of_beta_with_respect_to_y, _derivative_of_beta_with_respect_to_y, derivative_value_for_each_robot, _mpfr_rounding_mode);
             }
         }
     }
@@ -346,7 +346,7 @@ void PotentialFunction::calculateDerivativeOfBetaWithRespectToY(void)
     // For current robot and boundary
     double derivative_value_for_boundary = (-2 * _b_[_robot_id][0]) / (pow(_radius_outer - _b_[_robot_id][2], 2) - pow(_b_[_robot_id][0], 2) - pow(_b_[_robot_id][1], 2));
 
-    _derivative_of_beta_with_respect_to_y = _derivative_of_beta_with_respect_to_y + derivative_value_for_boundary;
+    mpfr_add_d(_derivative_of_beta_with_respect_to_y, _derivative_of_beta_with_respect_to_y, derivative_value_for_boundary, _mpfr_rounding_mode);
     
     // For current robot and obstacles
     for(int i=0; i<_number_of_obstacles; i++)
@@ -357,11 +357,11 @@ void PotentialFunction::calculateDerivativeOfBetaWithRespectToY(void)
         {
             double derivative_value_for_each_obstacle = 2 * (_b_[_robot_id][1] - _b_obstacles[i][1]) / (pow(_b_[_robot_id][0] - _b_obstacles[i][0], 2) + pow(_b_[_robot_id][1] - _b_obstacles[i][1], 2) - pow(_b_[_robot_id][2] + _b_obstacles[_robot_id][2], 2));
 
-            _derivative_of_beta_with_respect_to_y = _derivative_of_beta_with_respect_to_y + derivative_value_for_each_obstacle;
+            mpfr_add_d(_derivative_of_beta_with_respect_to_y, _derivative_of_beta_with_respect_to_y, derivative_value_for_each_obstacle, _mpfr_rounding_mode);
         }
     }
 
-    _derivative_of_beta_with_respect_to_y = _derivative_of_beta_with_respect_to_y * _beta;
+    mpfr_mul(_derivative_of_beta_with_respect_to_y, _derivative_of_beta_with_respect_to_y, _beta, _mpfr_rounding_mode);
 }
 
 
