@@ -272,14 +272,14 @@ class PotentialFunction: public rclcpp::Node
         /**
          * @brief dA/dX
         */
-        double _derivative_of_alpha_with_respect_to_x;
+        mpfr_t _derivative_of_alpha_with_respect_to_x;
 
 
 
         /**
          * @brief dA/dY
         */
-        double _derivative_of_alpha_with_respect_to_y;
+        mpfr_t _derivative_of_alpha_with_respect_to_y;
 
 
 
