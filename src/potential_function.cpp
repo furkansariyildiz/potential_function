@@ -277,7 +277,7 @@ void PotentialFunction::calculateDerivativeOfAlphaWithRespectToX(void)
 
 void PotentialFunction::calculateDerivativeOfAlphaWithRespectToY(void)
 {
-    _derivative_of_alpha_with_respect_to_y = 2 *(_b_[_robot_id][1] - _b_g[_robot_id][1]);
+    mpfr_set_d(_derivative_of_alpha_with_respect_to_y, 2 *(_b_[_robot_id][1] - _b_g[_robot_id][1]), _mpfr_rounding_mode);
 }
 
 
