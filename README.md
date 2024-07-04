@@ -10,6 +10,13 @@ cd ~ros2_ws/src
 git clone git@github.com:furkansariyildiz/potential_function.git
 ```
 
+### Installing MPFR and GMP library
+```bash
+sudo apt-get install  libgmp3-dev
+sudo apt-get install libmpc-dev
+```
+
+
 ### Building package
 ```bash
 source /opt/ros/$ROS_ENV/setup.bash
