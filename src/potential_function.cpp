@@ -57,6 +57,9 @@ _angular_velocity_controller(0.0, 0.0, 0.0)
 
     _number_of_robots = _name_of_robots.size();
 
+    // Getting default rounding mode
+    _mpfr_rounding_mode = mpfr_get_default_rounding_mode();
+
     // Setting Kp, Ki, Kd gains for linear velocity controller.
     _linear_velocity_controller.setKp(_Kp_v);
     _linear_velocity_controller.setKi(_Ki_v);
@@ -66,6 +69,9 @@ _angular_velocity_controller(0.0, 0.0, 0.0)
     _angular_velocity_controller.setKp(_Kp_w);
     _angular_velocity_controller.setKi(_Ki_w);
     _angular_velocity_controller.setKd(_Kd_w);
+
+    // Setting K_gain for mpfr_t
+    mpfr_set_d(_K_gain_with_mpfr_type, _K_gain, _mpfr_rounding_mode);
 
     // Setting linear and angular velocity controllers (PID).
     _linear_velocity_controller.setAntiWindup(_anti_windup_for_linear_velocity);
@@ -97,9 +103,6 @@ _angular_velocity_controller(0.0, 0.0, 0.0)
 
         _dynamic_subscribers.push_back(subscriber_info);
     }
-
-    // Getting default rounding mode
-    _mpfr_rounding_mode = mpfr_get_default_rounding_mode();
 }
 
 
@@ -368,20 +371,82 @@ void PotentialFunction::calculateDerivativeOfBetaWithRespectToY(void)
 
 void PotentialFunction::calculateDerivativeOfFWithRespectToX(void)
 {   
+    mpfr_t alpha_power, beta_power, numerator, intermediate_result, one_over_K_gain, gama_over_1_plus_gama, exponent_1, exponent_2, pow_1, pow_2, temp;
+
     /** Q = A^k / B **/
-    _gama = pow(_alpha, _K_gain) / _beta;
+    mpfr_pow(_gama, _alpha, _K_gain_with_mpfr_type, _mpfr_rounding_mode);
+    mpfr_div(_gama, _gama, _beta, _mpfr_rounding_mode);
+
 
     /** dQ/dA = k * A^(k-1) / B **/
-    _derivative_of_gama_with_respect_to_alpha = _K_gain * pow(_alpha, _K_gain - 1) / _beta;
+    mpfr_init(alpha_power);
+    mpfr_init(numerator);
+
+    mpfr_sub_ui(alpha_power, _K_gain_with_mpfr_type, 1, _mpfr_rounding_mode);
+    mpfr_pow(alpha_power, _alpha, alpha_power, _mpfr_rounding_mode);
+    mpfr_mul(numerator, _K_gain_with_mpfr_type, alpha_power, _mpfr_rounding_mode);
+    mpfr_div(_derivative_of_gama_with_respect_to_alpha, numerator, _beta, _mpfr_rounding_mode);
+
+    mpfr_clear(alpha_power);
+    mpfr_clear(numerator);
 
     /** dQ/dB = -1 * A^k / B^2 **/
-    _derivative_of_gama_with_respect_to_beta = -1 * pow(_alpha, _K_gain) / pow(_beta, 2);
+    mpfr_init(alpha_power);
+    mpfr_init(beta_power);
+    mpfr_init(numerator);
+
+    mpfr_pow(alpha_power, _alpha, _K_gain_with_mpfr_type, _mpfr_rounding_mode);
+    mpfr_pow_ui(beta_power, _beta, 2, _mpfr_rounding_mode);
+    mpfr_neg(numerator, alpha_power, _mpfr_rounding_mode);
+    mpfr_div(_derivative_of_gama_with_respect_to_beta, numerator, beta_power, _mpfr_rounding_mode);
+
+    mpfr_clear(alpha_power);
+    mpfr_clear(beta_power);
+    mpfr_clear(numerator);
 
     /** dQ/dX = dQ/dA * dA/dX + dQ/dB * dB/dX **/
-    _derivative_of_gama_with_respect_to_x = _derivative_of_gama_with_respect_to_alpha * _derivative_of_alpha_with_respect_to_x + _derivative_of_gama_with_respect_to_beta * _derivative_of_beta_with_respect_to_x;
+    mpfr_init(numerator);
+    mpfr_init(intermediate_result);
+    
+    mpfr_mul(intermediate_result, _derivative_of_gama_with_respect_to_alpha, _derivative_of_alpha_with_respect_to_x, _mpfr_rounding_mode);
+    mpfr_mul(numerator, _derivative_of_gama_with_respect_to_beta, _derivative_of_beta_with_respect_to_x, _mpfr_rounding_mode);
+    mpfr_add(_derivative_of_gama_with_respect_to_x, intermediate_result, numerator, _mpfr_rounding_mode);
+
+    mpfr_clear(numerator);
+    mpfr_clear(intermediate_result);
 
     /** dF/dX = 1/k * (Q / (1 + Q))^(1/k - 1) * (1 + Q)^-2 * dQ/dX **/
-    _derivative_of_f_with_respect_to_x = (1 / _K_gain) * pow((_gama / (1 + _gama)), (1 / _K_gain - 1)) * pow((1 + _gama), -2) * _derivative_of_gama_with_respect_to_x; 
+    mpfr_init(intermediate_result);
+    mpfr_init(one_over_K_gain);
+    mpfr_init(gama_over_1_plus_gama);
+    mpfr_init(exponent_1);
+    mpfr_init(exponent_2);
+    mpfr_init(pow_1);
+    mpfr_init(pow_2);
+    mpfr_init(temp);
+
+    mpfr_ui_div(one_over_K_gain, 1, _K_gain_with_mpfr_type, _mpfr_rounding_mode);
+    mpfr_add_ui(gama_over_1_plus_gama, _gama, 1, _mpfr_rounding_mode);
+    mpfr_div(gama_over_1_plus_gama, _gama, gama_over_1_plus_gama, _mpfr_rounding_mode);
+    mpfr_sub_ui(exponent_1, one_over_K_gain, 1, _mpfr_rounding_mode);
+    mpfr_pow(pow_1, gama_over_1_plus_gama, exponent_1, _mpfr_rounding_mode);
+
+    mpfr_add_ui(temp, _gama, 1, _mpfr_rounding_mode);
+    mpfr_pow_ui(pow_2, temp, 2, _mpfr_rounding_mode);
+    mpfr_ui_div(pow_2, 1, pow_2, _mpfr_rounding_mode);
+
+    mpfr_mul(intermediate_result, one_over_K_gain, pow_1, _mpfr_rounding_mode);
+    mpfr_mul(intermediate_result, intermediate_result, pow_2, _mpfr_rounding_mode);
+    mpfr_mul(_derivative_of_f_with_respect_to_x, intermediate_result, _derivative_of_gama_with_respect_to_x, _mpfr_rounding_mode);
+
+    mpfr_clear(intermediate_result);
+    mpfr_clear(one_over_K_gain);
+    mpfr_clear(gama_over_1_plus_gama);
+    mpfr_clear(exponent_1);
+    mpfr_clear(exponent_2);
+    mpfr_clear(pow_1);
+    mpfr_clear(pow_2);
+    mpfr_clear(temp);    
 }
 
 
