@@ -251,7 +251,7 @@ class PotentialFunction: public rclcpp::Node
         /**
          * @brief Gama (Q)
         */
-        double _gama;
+        mpfr_t _gama;
 
 
 
@@ -300,35 +300,35 @@ class PotentialFunction: public rclcpp::Node
         /**
          * @brief dQ/dX
         */
-        double _derivative_of_gama_with_respect_to_x;
+        mpfr_t _derivative_of_gama_with_respect_to_x;
 
 
 
         /**
          * @brief dQ/dY
         */
-        double _derivative_of_gama_with_respect_to_y;
+        mpfr_t _derivative_of_gama_with_respect_to_y;
 
 
 
         /**
          * @brief dQ/dA
         */
-        double _derivative_of_gama_with_respect_to_alpha;
+        mpfr_t _derivative_of_gama_with_respect_to_alpha;
 
 
 
         /**
          * @brief dQ/dB
         */
-        double _derivative_of_gama_with_respect_to_beta;
+        mpfr_t _derivative_of_gama_with_respect_to_beta;
 
 
 
         /**
          * @brief dF/dX
         */
-        double _derivative_of_f_with_respect_to_x;
+        mpfr_t _derivative_of_f_with_respect_to_x;
 
 
 
@@ -342,6 +342,13 @@ class PotentialFunction: public rclcpp::Node
          * @brief Parameter for potential function.
         */
         double _K_gain;
+
+
+
+        /**
+         * @brief Parameter for potential function with mpfr_t to use this value on mpfr_pow and mpfr_mul.
+         */
+        mpfr_t _K_gain_with_mpfr_type;
 
 
 
