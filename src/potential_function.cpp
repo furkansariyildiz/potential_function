@@ -58,7 +58,7 @@ _angular_velocity_controller(0.0, 0.0, 0.0)
     _number_of_robots = _name_of_robots.size();
 
     // Getting default rounding mode
-    _mpfr_rounding_mode = mpfr_get_default_rounding_mode();
+    // _mpfr_rounding_mode = mpfr_get_default_rounding_mode();
 
     // Setting Kp, Ki, Kd gains for linear velocity controller.
     _linear_velocity_controller.setKp(_Kp_v);
@@ -70,8 +70,24 @@ _angular_velocity_controller(0.0, 0.0, 0.0)
     _angular_velocity_controller.setKi(_Ki_w);
     _angular_velocity_controller.setKd(_Kd_w);
 
-    // Setting K_gain for mpfr_t
-    mpfr_set_d(_K_gain_with_mpfr_type, _K_gain, _mpfr_rounding_mode);
+    // Initialize all mpfr_t class variables.
+    mpfr_init(_alpha);
+    mpfr_init(_beta);
+    mpfr_init(_gama);
+    mpfr_init(_derivative_of_alpha_with_respect_to_x);
+    mpfr_init(_derivative_of_alpha_with_respect_to_y);
+    mpfr_init(_derivative_of_beta_with_respect_to_x);
+    mpfr_init(_derivative_of_beta_with_respect_to_y);
+    mpfr_init(_derivative_of_gama_with_respect_to_x);
+    mpfr_init(_derivative_of_gama_with_respect_to_y);
+    mpfr_init(_derivative_of_gama_with_respect_to_alpha);
+    mpfr_init(_derivative_of_gama_with_respect_to_beta);
+    mpfr_init(_derivative_of_f_with_respect_to_x);
+    mpfr_init(_derivative_of_f_with_respect_to_y);
+    mpfr_init(_K_gain_with_mpfr_type);
+
+    // Setting K_gain for mpfr_t.
+    mpfr_set_d(_K_gain_with_mpfr_type, _K_gain, MPFR_RNDN);
 
     // Setting linear and angular velocity controllers (PID).
     _linear_velocity_controller.setAntiWindup(_anti_windup_for_linear_velocity);
@@ -188,7 +204,7 @@ void PotentialFunction::findRobotsInRange(void)
 
 void PotentialFunction::calculateAlphaAndBeta(void)
 {
-    mpfr_set_d(_alpha, 0.0, _mpfr_rounding_mode);
+    mpfr_set_d(_alpha, 0.0, MPFR_RNDN);
     
     for(int i=0; i<_number_of_robots; i++)
     {
@@ -196,11 +212,11 @@ void PotentialFunction::calculateAlphaAndBeta(void)
         {
             double distance = pow((_b_[i][0] - _b_g[i][0]), 2) + pow((_b_[i][1] - _b_g[i][1]), 2);
                         
-            mpfr_add_d(_alpha, _alpha, distance, _mpfr_rounding_mode);
+            mpfr_add_d(_alpha, _alpha, distance, MPFR_RNDN);
         }
     }
 
-    mpfr_set_d(_beta, 1.0, _mpfr_rounding_mode);
+    mpfr_set_d(_beta, 1.0, MPFR_RNDN);
 
     for(int i=0; i<_number_of_robots; i++)
     {
@@ -215,7 +231,7 @@ void PotentialFunction::calculateAlphaAndBeta(void)
             }
             if(distance > 0)
             {
-                mpfr_mul_d(_beta, _beta, distance, _mpfr_rounding_mode);
+                mpfr_mul_d(_beta, _beta, distance, MPFR_RNDN);
             }
         }
     }
@@ -236,7 +252,7 @@ void PotentialFunction::calculateAlphaAndBeta(void)
                 }
                 if(distance > 0)
                 {
-                    mpfr_mul_d(_beta, _beta, distance, _mpfr_rounding_mode);
+                    mpfr_mul_d(_beta, _beta, distance, MPFR_RNDN);
                 }
             }
         }
@@ -249,7 +265,7 @@ void PotentialFunction::calculateAlphaAndBeta(void)
 
         if(distance < _limit_distance_for_obstacles)
         {
-            mpfr_mul_d(_beta, _beta, distance, _mpfr_rounding_mode);
+            mpfr_mul_d(_beta, _beta, distance, MPFR_RNDN);
         }
     }
 
@@ -264,7 +280,7 @@ void PotentialFunction::calculateAlphaAndBeta(void)
         }
         if(distance > 0)
         {
-            mpfr_mul_d(_beta, _beta, distance, _mpfr_rounding_mode);
+            mpfr_mul_d(_beta, _beta, distance, MPFR_RNDN);
         }
     }
 }
@@ -273,21 +289,21 @@ void PotentialFunction::calculateAlphaAndBeta(void)
 
 void PotentialFunction::calculateDerivativeOfAlphaWithRespectToX(void)
 {
-    mpfr_set_d(_derivative_of_alpha_with_respect_to_x, 2 * (_b_[_robot_id][0] - _b_g[_robot_id][0]), _mpfr_rounding_mode);
+    mpfr_set_d(_derivative_of_alpha_with_respect_to_x, 2 * (_b_[_robot_id][0] - _b_g[_robot_id][0]), MPFR_RNDN);
 }
 
 
 
 void PotentialFunction::calculateDerivativeOfAlphaWithRespectToY(void)
 {
-    mpfr_set_d(_derivative_of_alpha_with_respect_to_y, 2 *(_b_[_robot_id][1] - _b_g[_robot_id][1]), _mpfr_rounding_mode);
+    mpfr_set_d(_derivative_of_alpha_with_respect_to_y, 2 *(_b_[_robot_id][1] - _b_g[_robot_id][1]), MPFR_RNDN);
 }
 
 
 
 void PotentialFunction::calculateDerivativeOfBetaWithRespectToX(void)
 {
-    mpfr_set_d(_derivative_of_beta_with_respect_to_x, 0.0, _mpfr_rounding_mode);
+    mpfr_set_d(_derivative_of_beta_with_respect_to_x, 0.0, MPFR_RNDN);
 
     // For current robot and other robots    
     for(int i=0; i<_number_of_robots; i++)
@@ -299,7 +315,7 @@ void PotentialFunction::calculateDerivativeOfBetaWithRespectToX(void)
             if(_b_[i][2] != 0)
             {
                 derivative_value_for_each_robot = 2 * (_b_[_robot_id][0] - _b_[i][0]) / (pow((_b_[_robot_id][0] - _b_[i][0]), 2) + pow(_b_[_robot_id][1] - _b_[i][1], 2) - pow(_b_[_robot_id][2] + _b_[i][2], 2));
-                mpfr_add_d(_derivative_of_beta_with_respect_to_x, _derivative_of_beta_with_respect_to_x, derivative_value_for_each_robot, _mpfr_rounding_mode);
+                mpfr_add_d(_derivative_of_beta_with_respect_to_x, _derivative_of_beta_with_respect_to_x, derivative_value_for_each_robot, MPFR_RNDN);
             }
         }
     }
@@ -307,7 +323,7 @@ void PotentialFunction::calculateDerivativeOfBetaWithRespectToX(void)
     // For current robot and boundary
     double derivative_value_for_boundary = (-2 * _b_[_robot_id][0]) / (pow(_radius_outer - _b_[_robot_id][2], 2) - pow(_b_[_robot_id][0], 2) - pow(_b_[_robot_id][1], 2));
 
-    mpfr_add_d(_derivative_of_beta_with_respect_to_x, _derivative_of_beta_with_respect_to_x, derivative_value_for_boundary, _mpfr_rounding_mode);
+    mpfr_add_d(_derivative_of_beta_with_respect_to_x, _derivative_of_beta_with_respect_to_x, derivative_value_for_boundary, MPFR_RNDN);
 
     // For current robot and obstacles
     for(int i=0; i<_number_of_obstacles; i++)
@@ -318,18 +334,18 @@ void PotentialFunction::calculateDerivativeOfBetaWithRespectToX(void)
         {
             double derivative_value_for_each_obstacle = 2 * (_b_[_robot_id][0] - _b_obstacles[i][0]) / (pow(_b_[_robot_id][0] - _b_obstacles[i][0], 2) + pow(_b_[_robot_id][1] - _b_obstacles[i][1], 2) - pow(_b_[_robot_id][2] + _b_obstacles[_robot_id][2], 2));
 
-            mpfr_add_d(_derivative_of_beta_with_respect_to_x, _derivative_of_beta_with_respect_to_x, derivative_value_for_each_obstacle, _mpfr_rounding_mode);
+            mpfr_add_d(_derivative_of_beta_with_respect_to_x, _derivative_of_beta_with_respect_to_x, derivative_value_for_each_obstacle, MPFR_RNDN);
         } 
     }
 
-    mpfr_mul(_derivative_of_beta_with_respect_to_x, _derivative_of_beta_with_respect_to_x, _beta, _mpfr_rounding_mode);
+    mpfr_mul(_derivative_of_beta_with_respect_to_x, _derivative_of_beta_with_respect_to_x, _beta, MPFR_RNDN);
 }
 
 
 
 void PotentialFunction::calculateDerivativeOfBetaWithRespectToY(void)
 {
-    mpfr_set_d(_derivative_of_beta_with_respect_to_y, 0.0, _mpfr_rounding_mode);
+    mpfr_set_d(_derivative_of_beta_with_respect_to_y, 0.0, MPFR_RNDN);
 
     // For current robot and other robots
     for(int i=0; i<_number_of_robots; i++)
@@ -341,7 +357,7 @@ void PotentialFunction::calculateDerivativeOfBetaWithRespectToY(void)
             if(_b_[i][2] != 0)
             {
                 derivative_value_for_each_robot = 2 * (_b_[_robot_id][1] - _b_[i][1]) / (pow(_b_[_robot_id][0] - _b_[i][0], 2) + pow(_b_[_robot_id][1] - _b_[i][1], 2) - pow(_b_[_robot_id][2] + _b_[i][2], 2));
-                mpfr_add_d(_derivative_of_beta_with_respect_to_y, _derivative_of_beta_with_respect_to_y, derivative_value_for_each_robot, _mpfr_rounding_mode);
+                mpfr_add_d(_derivative_of_beta_with_respect_to_y, _derivative_of_beta_with_respect_to_y, derivative_value_for_each_robot, MPFR_RNDN);
             }
         }
     }
@@ -349,7 +365,7 @@ void PotentialFunction::calculateDerivativeOfBetaWithRespectToY(void)
     // For current robot and boundary
     double derivative_value_for_boundary = (-2 * _b_[_robot_id][0]) / (pow(_radius_outer - _b_[_robot_id][2], 2) - pow(_b_[_robot_id][0], 2) - pow(_b_[_robot_id][1], 2));
 
-    mpfr_add_d(_derivative_of_beta_with_respect_to_y, _derivative_of_beta_with_respect_to_y, derivative_value_for_boundary, _mpfr_rounding_mode);
+    mpfr_add_d(_derivative_of_beta_with_respect_to_y, _derivative_of_beta_with_respect_to_y, derivative_value_for_boundary, MPFR_RNDN);
     
     // For current robot and obstacles
     for(int i=0; i<_number_of_obstacles; i++)
@@ -360,62 +376,24 @@ void PotentialFunction::calculateDerivativeOfBetaWithRespectToY(void)
         {
             double derivative_value_for_each_obstacle = 2 * (_b_[_robot_id][1] - _b_obstacles[i][1]) / (pow(_b_[_robot_id][0] - _b_obstacles[i][0], 2) + pow(_b_[_robot_id][1] - _b_obstacles[i][1], 2) - pow(_b_[_robot_id][2] + _b_obstacles[_robot_id][2], 2));
 
-            mpfr_add_d(_derivative_of_beta_with_respect_to_y, _derivative_of_beta_with_respect_to_y, derivative_value_for_each_obstacle, _mpfr_rounding_mode);
+            mpfr_add_d(_derivative_of_beta_with_respect_to_y, _derivative_of_beta_with_respect_to_y, derivative_value_for_each_obstacle, MPFR_RNDN);
         }
     }
 
-    mpfr_mul(_derivative_of_beta_with_respect_to_y, _derivative_of_beta_with_respect_to_y, _beta, _mpfr_rounding_mode);
+    mpfr_mul(_derivative_of_beta_with_respect_to_y, _derivative_of_beta_with_respect_to_y, _beta, MPFR_RNDN);
 }
 
 
 
 void PotentialFunction::calculateDerivativeOfFWithRespectToX(void)
 {   
+    /** Define mpfr_t variables **/
     mpfr_t alpha_power, beta_power, numerator, intermediate_result, one_over_K_gain, gama_over_1_plus_gama, exponent_1, exponent_2, pow_1, pow_2, temp;
-
-    /** Q = A^k / B **/
-    mpfr_pow(_gama, _alpha, _K_gain_with_mpfr_type, _mpfr_rounding_mode);
-    mpfr_div(_gama, _gama, _beta, _mpfr_rounding_mode);
-
-
-    /** dQ/dA = k * A^(k-1) / B **/
-    mpfr_init(alpha_power);
-    mpfr_init(numerator);
-
-    mpfr_sub_ui(alpha_power, _K_gain_with_mpfr_type, 1, _mpfr_rounding_mode);
-    mpfr_pow(alpha_power, _alpha, alpha_power, _mpfr_rounding_mode);
-    mpfr_mul(numerator, _K_gain_with_mpfr_type, alpha_power, _mpfr_rounding_mode);
-    mpfr_div(_derivative_of_gama_with_respect_to_alpha, numerator, _beta, _mpfr_rounding_mode);
-
-    mpfr_clear(alpha_power);
-    mpfr_clear(numerator);
-
-    /** dQ/dB = -1 * A^k / B^2 **/
-    mpfr_init(alpha_power);
-    mpfr_init(beta_power);
-    mpfr_init(numerator);
-
-    mpfr_pow(alpha_power, _alpha, _K_gain_with_mpfr_type, _mpfr_rounding_mode);
-    mpfr_pow_ui(beta_power, _beta, 2, _mpfr_rounding_mode);
-    mpfr_neg(numerator, alpha_power, _mpfr_rounding_mode);
-    mpfr_div(_derivative_of_gama_with_respect_to_beta, numerator, beta_power, _mpfr_rounding_mode);
-
-    mpfr_clear(alpha_power);
-    mpfr_clear(beta_power);
-    mpfr_clear(numerator);
-
-    /** dQ/dX = dQ/dA * dA/dX + dQ/dB * dB/dX **/
-    mpfr_init(numerator);
-    mpfr_init(intermediate_result);
     
-    mpfr_mul(intermediate_result, _derivative_of_gama_with_respect_to_alpha, _derivative_of_alpha_with_respect_to_x, _mpfr_rounding_mode);
-    mpfr_mul(numerator, _derivative_of_gama_with_respect_to_beta, _derivative_of_beta_with_respect_to_x, _mpfr_rounding_mode);
-    mpfr_add(_derivative_of_gama_with_respect_to_x, intermediate_result, numerator, _mpfr_rounding_mode);
-
-    mpfr_clear(numerator);
-    mpfr_clear(intermediate_result);
-
-    /** dF/dX = 1/k * (Q / (1 + Q))^(1/k - 1) * (1 + Q)^-2 * dQ/dX **/
+    /** Init mpfr variables **/
+    mpfr_init(alpha_power);
+    mpfr_init(numerator);
+    mpfr_init(beta_power);
     mpfr_init(intermediate_result);
     mpfr_init(one_over_K_gain);
     mpfr_init(gama_over_1_plus_gama);
@@ -425,20 +403,47 @@ void PotentialFunction::calculateDerivativeOfFWithRespectToX(void)
     mpfr_init(pow_2);
     mpfr_init(temp);
 
-    mpfr_ui_div(one_over_K_gain, 1, _K_gain_with_mpfr_type, _mpfr_rounding_mode);
-    mpfr_add_ui(gama_over_1_plus_gama, _gama, 1, _mpfr_rounding_mode);
-    mpfr_div(gama_over_1_plus_gama, _gama, gama_over_1_plus_gama, _mpfr_rounding_mode);
-    mpfr_sub_ui(exponent_1, one_over_K_gain, 1, _mpfr_rounding_mode);
-    mpfr_pow(pow_1, gama_over_1_plus_gama, exponent_1, _mpfr_rounding_mode);
+    /** Q = A^k / B **/
+    mpfr_pow(_gama, _alpha, _K_gain_with_mpfr_type, MPFR_RNDN);
+    mpfr_div(_gama, _gama, _beta, MPFR_RNDN);
 
-    mpfr_add_ui(temp, _gama, 1, _mpfr_rounding_mode);
-    mpfr_pow_ui(pow_2, temp, 2, _mpfr_rounding_mode);
-    mpfr_ui_div(pow_2, 1, pow_2, _mpfr_rounding_mode);
 
-    mpfr_mul(intermediate_result, one_over_K_gain, pow_1, _mpfr_rounding_mode);
-    mpfr_mul(intermediate_result, intermediate_result, pow_2, _mpfr_rounding_mode);
-    mpfr_mul(_derivative_of_f_with_respect_to_x, intermediate_result, _derivative_of_gama_with_respect_to_x, _mpfr_rounding_mode);
+    /** dQ/dA = k * A^(k-1) / B **/
+    mpfr_sub_ui(alpha_power, _K_gain_with_mpfr_type, 1, MPFR_RNDN);
+    mpfr_pow(alpha_power, _alpha, alpha_power, MPFR_RNDN);
+    mpfr_mul(numerator, _K_gain_with_mpfr_type, alpha_power, MPFR_RNDN);
+    mpfr_div(_derivative_of_gama_with_respect_to_alpha, numerator, _beta, MPFR_RNDN);
 
+    /** dQ/dB = -1 * A^k / B^2 **/
+    mpfr_pow(alpha_power, _alpha, _K_gain_with_mpfr_type, MPFR_RNDN);
+    mpfr_pow_ui(beta_power, _beta, 2, MPFR_RNDN);
+    mpfr_neg(numerator, alpha_power, MPFR_RNDN);
+    mpfr_div(_derivative_of_gama_with_respect_to_beta, numerator, beta_power, MPFR_RNDN);
+
+    /** dQ/dX = dQ/dA * dA/dX + dQ/dB * dB/dX **/
+    mpfr_mul(intermediate_result, _derivative_of_gama_with_respect_to_alpha, _derivative_of_alpha_with_respect_to_x, MPFR_RNDN);
+    mpfr_mul(numerator, _derivative_of_gama_with_respect_to_beta, _derivative_of_beta_with_respect_to_x, MPFR_RNDN);
+    mpfr_add(_derivative_of_gama_with_respect_to_x, intermediate_result, numerator, MPFR_RNDN);
+
+    /** dF/dX = 1/k * (Q / (1 + Q))^(1/k - 1) * (1 + Q)^-2 * dQ/dX **/
+    mpfr_ui_div(one_over_K_gain, 1, _K_gain_with_mpfr_type, MPFR_RNDN);
+    mpfr_add_ui(gama_over_1_plus_gama, _gama, 1, MPFR_RNDN);
+    mpfr_div(gama_over_1_plus_gama, _gama, gama_over_1_plus_gama, MPFR_RNDN);
+    mpfr_sub_ui(exponent_1, one_over_K_gain, 1, MPFR_RNDN);
+    mpfr_pow(pow_1, gama_over_1_plus_gama, exponent_1, MPFR_RNDN);
+
+    mpfr_add_ui(temp, _gama, 1, MPFR_RNDN);
+    mpfr_pow_ui(pow_2, temp, 2, MPFR_RNDN);
+    mpfr_ui_div(pow_2, 1, pow_2, MPFR_RNDN);
+
+    mpfr_mul(intermediate_result, one_over_K_gain, pow_1, MPFR_RNDN);
+    mpfr_mul(intermediate_result, intermediate_result, pow_2, MPFR_RNDN);
+    mpfr_mul(_derivative_of_f_with_respect_to_x, intermediate_result, _derivative_of_gama_with_respect_to_x, MPFR_RNDN);
+
+    /** Clear mpfr_t variables **/
+    mpfr_clear(alpha_power);
+    mpfr_clear(numerator);
+    mpfr_clear(beta_power);
     mpfr_clear(intermediate_result);
     mpfr_clear(one_over_K_gain);
     mpfr_clear(gama_over_1_plus_gama);
@@ -453,20 +458,67 @@ void PotentialFunction::calculateDerivativeOfFWithRespectToX(void)
 
 void PotentialFunction::calculateDerivativeOfFWithRespectToY(void)
 {
-    /** Q = A^k / B **/
-    _gama = pow(_alpha, _K_gain) / _beta;
+    /** Define mpfr_t variables **/
+    mpfr_t alpha_power, alpha_power_derivative, beta_power, temp, one_over_K_gain, gama_over_1_plus_gama, exponent_1, exponent_2, pow_1, pow_2, intermediate_result;
 
+    /** Init mpfr variables **/
+    mpfr_init(alpha_power);
+    mpfr_init(alpha_power_derivative);
+    mpfr_init(beta_power);
+    mpfr_init(temp);
+    mpfr_init(one_over_K_gain);
+    mpfr_init(gama_over_1_plus_gama);
+    mpfr_init(exponent_1);
+    mpfr_init(exponent_2);
+    mpfr_init(pow_1);
+    mpfr_init(pow_2);
+    mpfr_init(intermediate_result);
+
+    /** Q = A^k / B **/
+    mpfr_pow(alpha_power, _alpha, _K_gain_with_mpfr_type, MPFR_RNDN);
+    mpfr_div(_gama, alpha_power, _beta, MPFR_RNDN);
+    
     /** dQ/dA = k * A^(k-1) / B **/
-    _derivative_of_gama_with_respect_to_alpha = _K_gain * pow(_alpha, _K_gain - 1) / _beta;
+    mpfr_sub_ui(alpha_power_derivative, _K_gain_with_mpfr_type, 1, MPFR_RNDN);
+    mpfr_pow(alpha_power_derivative, _alpha, alpha_power_derivative, MPFR_RNDN);
+    mpfr_mul(alpha_power_derivative, alpha_power_derivative, _K_gain_with_mpfr_type, MPFR_RNDN);
+    mpfr_div(_derivative_of_gama_with_respect_to_alpha, alpha_power_derivative, _beta, MPFR_RNDN);
+
 
     /** dQ/dB = -1 * A^k / B^2 **/
-    _derivative_of_gama_with_respect_to_beta = -1 * pow(_alpha, _K_gain) / pow(_beta, 2);
+    mpfr_pow_ui(beta_power, _beta, 2, MPFR_RNDN);
+    mpfr_div(_derivative_of_gama_with_respect_to_beta, alpha_power, beta_power, MPFR_RNDN);
+    mpfr_neg(_derivative_of_gama_with_respect_to_beta, _derivative_of_gama_with_respect_to_beta, MPFR_RNDN);
 
     /** dQ/dY = dQ/dA * dA/dY + dQ/dB * dB/dY **/
-    _derivative_of_gama_with_respect_to_y = _derivative_of_gama_with_respect_to_alpha * _derivative_of_alpha_with_respect_to_y + _derivative_of_gama_with_respect_to_beta * _derivative_of_beta_with_respect_to_y;
+    mpfr_mul(temp, _derivative_of_gama_with_respect_to_alpha, _derivative_of_alpha_with_respect_to_y, MPFR_RNDN);
+    mpfr_mul(_derivative_of_gama_with_respect_to_y, _derivative_of_gama_with_respect_to_beta, _derivative_of_beta_with_respect_to_y, MPFR_RNDN);
+    mpfr_add(_derivative_of_gama_with_respect_to_y, temp, _derivative_of_gama_with_respect_to_y, MPFR_RNDN);
 
     /** dF/dY =  1/k * (Q / (1 + Q))^(1/k - 1) * (1 + Q)^-2 * dQ/dY **/
-    _derivative_of_f_with_respect_to_y = (1 / _K_gain) * pow((_gama / (1 + _gama)), (1 / _K_gain - 1)) * pow((1 + _gama), -2) * _derivative_of_gama_with_respect_to_y; 
+    mpfr_ui_div(one_over_K_gain, 1, _K_gain_with_mpfr_type, MPFR_RNDN);
+    mpfr_add_ui(temp, _gama, 1, MPFR_RNDN);
+    mpfr_div(gama_over_1_plus_gama, _gama, temp, MPFR_RNDN);
+    mpfr_sub_ui(exponent_1, one_over_K_gain, 1, MPFR_RNDN);
+    mpfr_pow(pow_1, gama_over_1_plus_gama, exponent_1, MPFR_RNDN);
+    mpfr_pow_ui(pow_2, temp, 2, MPFR_RNDN);
+    mpfr_ui_div(pow_2, 1, pow_2, MPFR_RNDN);
+    mpfr_mul(intermediate_result, one_over_K_gain, pow_1, MPFR_RNDN);
+    mpfr_mul(intermediate_result, intermediate_result, pow_2, MPFR_RNDN);
+    mpfr_mul(_derivative_of_f_with_respect_to_y, intermediate_result, _derivative_of_gama_with_respect_to_y, MPFR_RNDN);
+
+    /** Clear mpfr_t variables **/
+    mpfr_clear(alpha_power);
+    mpfr_clear(alpha_power_derivative);
+    mpfr_clear(beta_power);
+    mpfr_clear(temp);
+    mpfr_clear(one_over_K_gain);
+    mpfr_clear(gama_over_1_plus_gama);
+    mpfr_clear(exponent_1);
+    mpfr_clear(exponent_2);
+    mpfr_clear(pow_1);
+    mpfr_clear(pow_2);
+    mpfr_clear(intermediate_result);
 }
 
 
@@ -486,8 +538,8 @@ void PotentialFunction::robotController(void)
     calculateDerivativeOfFWithRespectToX();
     calculateDerivativeOfFWithRespectToY();
 
-    double b_out_x = -1 * _derivative_of_f_with_respect_to_x;
-    double b_out_y = -1 * _derivative_of_f_with_respect_to_y;
+    double b_out_x = -1 * mpfr_get_d(_derivative_of_f_with_respect_to_x, MPFR_RNDN);
+    double b_out_y = -1 * mpfr_get_d(_derivative_of_f_with_respect_to_y, MPFR_RNDN);
 
 
     _desired_heading = atan2(b_out_y, b_out_x);
