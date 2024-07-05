@@ -125,6 +125,21 @@ _angular_velocity_controller(0.0, 0.0, 0.0)
 
 PotentialFunction::~PotentialFunction()
 {
+    mpfr_clear(_alpha);
+    mpfr_clear(_beta);
+    mpfr_clear(_gama);
+    mpfr_clear(_derivative_of_alpha_with_respect_to_x);
+    mpfr_clear(_derivative_of_alpha_with_respect_to_y);
+    mpfr_clear(_derivative_of_beta_with_respect_to_x);
+    mpfr_clear(_derivative_of_beta_with_respect_to_y);
+    mpfr_clear(_derivative_of_gama_with_respect_to_x);
+    mpfr_clear(_derivative_of_gama_with_respect_to_y);
+    mpfr_clear(_derivative_of_gama_with_respect_to_alpha);
+    mpfr_clear(_derivative_of_gama_with_respect_to_beta);
+    mpfr_clear(_derivative_of_f_with_respect_to_x);
+    mpfr_clear(_derivative_of_f_with_respect_to_y);
+    mpfr_clear(_K_gain_with_mpfr_type);
+    
     RCLCPP_INFO_STREAM(this->get_logger(), "Potential function node is closing...");
 }
 
@@ -407,7 +422,6 @@ void PotentialFunction::calculateDerivativeOfFWithRespectToX(void)
     mpfr_pow(_gama, _alpha, _K_gain_with_mpfr_type, MPFR_RNDN);
     mpfr_div(_gama, _gama, _beta, MPFR_RNDN);
 
-
     /** dQ/dA = k * A^(k-1) / B **/
     mpfr_sub_ui(alpha_power, _K_gain_with_mpfr_type, 1, MPFR_RNDN);
     mpfr_pow(alpha_power, _alpha, alpha_power, MPFR_RNDN);
@@ -484,7 +498,6 @@ void PotentialFunction::calculateDerivativeOfFWithRespectToY(void)
     mpfr_mul(alpha_power_derivative, alpha_power_derivative, _K_gain_with_mpfr_type, MPFR_RNDN);
     mpfr_div(_derivative_of_gama_with_respect_to_alpha, alpha_power_derivative, _beta, MPFR_RNDN);
 
-
     /** dQ/dB = -1 * A^k / B^2 **/
     mpfr_pow_ui(beta_power, _beta, 2, MPFR_RNDN);
     mpfr_div(_derivative_of_gama_with_respect_to_beta, alpha_power, beta_power, MPFR_RNDN);
@@ -541,7 +554,6 @@ void PotentialFunction::robotController(void)
     double b_out_x = -1 * mpfr_get_d(_derivative_of_f_with_respect_to_x, MPFR_RNDN);
     double b_out_y = -1 * mpfr_get_d(_derivative_of_f_with_respect_to_y, MPFR_RNDN);
 
-
     _desired_heading = atan2(b_out_y, b_out_x);
     double heading_error =  _desired_heading - _b_rpy[_robot_id][2];
 
@@ -560,7 +572,6 @@ void PotentialFunction::robotController(void)
 
     RCLCPP_INFO_STREAM(this->get_logger(), "b_out_x: " << b_out_x);
     RCLCPP_INFO_STREAM(this->get_logger(), "b_out_y: " << b_out_y);
-
 
     RCLCPP_INFO_STREAM(this->get_logger(), "Distance: " << distance_error);
     RCLCPP_INFO_STREAM(this->get_logger(), "Liner Velocity: " << _cmd_vel_message.linear.x);
