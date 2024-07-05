@@ -335,7 +335,7 @@ class PotentialFunction: public rclcpp::Node
         /**
          * @brief dF/dY
         */
-        double _derivative_of_f_with_respect_to_y;
+        mpfr_t _derivative_of_f_with_respect_to_y;
 
 
         /**
